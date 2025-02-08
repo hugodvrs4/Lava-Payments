@@ -1,0 +1,13 @@
+{
+  "devDependencies": {
+    "@nomiclabs/hardhat-waffle": "^1.0.0",
+    "hardhat": "^2.22.18"
+  },
+  "dependencies": {
+    "babel-traverse": "^6.26.0",
+    "dotenv": "^16.4.7",
+    "glob": "^11.0.1",
+    "uuid": "^11.0.5",
+    "ws": "^8.18.0"
+  }
+}
