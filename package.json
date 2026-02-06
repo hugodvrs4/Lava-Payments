@@ -1,0 +1,15 @@
+{
+  "name": "lava-payment",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Web3 payments app for Plasma blockchain",
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm -r build",
+    "clean": "pnpm -r clean && rm -rf node_modules"
+  },
+  "engines": {
+    "node": ">=18",
+    "pnpm": ">=8"
+  }
+}
