@@ -6,7 +6,7 @@ export function HomePage() {
 
   return (
     <div style={{ padding: '1rem' }}>
-      <h1>Lava Payment</h1>
+      <h1>Lava Payments</h1>
       <p style={{ marginTop: '0.5rem', color: '#666' }}>
         Web3 payments on Plasma blockchain
       </p>
