@@ -13,6 +13,13 @@ export function ReceivePage() {
   const handleCreateInvoice = () => {
     if (!address || !amount) return
 
+    // Validate amount is a valid number
+    const numAmount = parseFloat(amount)
+    if (isNaN(numAmount) || numAmount <= 0) {
+      alert('Please enter a valid amount greater than 0')
+      return
+    }
+
     const invoice: InvoicePayload = {
       recipient: address,
       amount,

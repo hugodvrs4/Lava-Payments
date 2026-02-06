@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { useNavigate } from 'react-router-dom'
 import { parseUnits } from 'viem'
@@ -28,10 +28,30 @@ export function PayPage() {
   const { data: hash, writeContract } = useWriteContract()
   const { isLoading: isConfirming } = useWaitForTransactionReceipt({ hash })
 
+  // Navigate to receipt page when transaction hash is available
+  useEffect(() => {
+    if (hash) {
+      navigate(`/receipt/${hash}`)
+    }
+  }, [hash, navigate])
+
   const handleDecodeInvoice = () => {
     try {
       setError(null)
       const decoded = JSON.parse(atob(invoiceCode))
+      
+      // Validate required fields
+      if (!decoded.recipient || !decoded.amount || !decoded.timestamp) {
+        setError('Invalid invoice: missing required fields')
+        return
+      }
+      
+      // Validate recipient is a valid address format
+      if (!/^0x[a-fA-F0-9]{40}$/.test(decoded.recipient)) {
+        setError('Invalid recipient address')
+        return
+      }
+      
       setInvoice(decoded)
     } catch {
       setError('Invalid invoice code')
@@ -53,11 +73,6 @@ export function PayPage() {
     } catch (err) {
       setError('Payment failed: ' + (err as Error).message)
     }
-  }
-
-  if (hash) {
-    navigate(`/receipt/${hash}`)
-    return null
   }
 
   return (

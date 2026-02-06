@@ -23,5 +23,6 @@ export const PLASMA_CHAIN = {
   },
 } as const;
 
+// TODO: Replace with actual USDT0 contract address on Plasma network
 export const USDT0_ADDRESS = '0x0000000000000000000000000000000000000000' as const;
 export const USDT0_DECIMALS = 6;
