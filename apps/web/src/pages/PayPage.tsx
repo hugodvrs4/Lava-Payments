@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import { useAccount, useWriteContract, useWaitForTransactionReceipt, useChainId } from 'wagmi'
 import { useNavigate } from 'react-router-dom'
 import { ZERO_FEE_CONFIG } from '@lava-payment/shared'
 import type { InvoicePayload } from '@lava-payment/shared'
@@ -7,6 +7,7 @@ import { PaymentService } from '../services/paymentService'
 
 export function PayPage() {
   const { isConnected } = useAccount()
+  const chainId = useChainId()
   const navigate = useNavigate()
   const [invoiceCode, setInvoiceCode] = useState('')
   const [invoice, setInvoice] = useState<InvoicePayload | null>(null)
@@ -77,6 +78,7 @@ export function PayPage() {
           to: invoice.to,
           amount: invoice.amount,
           useZeroFee,
+          chainId,
         },
         writeContract
       )

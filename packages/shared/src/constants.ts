@@ -23,8 +23,18 @@ export const PLASMA_CHAIN = {
   },
 } as const;
 
-// TODO: Replace with actual USDT0 contract address on Plasma network
-export const USDT0_ADDRESS = '0x0000000000000000000000000000000000000000' as const;
+// Network-specific USDT0 addresses - SINGLE SOURCE OF TRUTH
+export const PLASMA_NETWORKS = {
+  9745: {
+    name: "Plasma Mainnet",
+    usdt: "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
+  },
+  9746: {
+    name: "Plasma Testnet",
+    usdt: "0x502012b361AebCE43b26Ec812B74D9a51dB4D412",
+  },
+} as const;
+
 export const USDT0_DECIMALS = 6;
 
 // Zero-fee configuration (Plasma paymaster/relayer)
