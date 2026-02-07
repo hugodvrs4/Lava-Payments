@@ -4,7 +4,7 @@ export function HistoryPage() {
   const navigate = useNavigate()
 
   return (
-    <div style={{ padding: '1rem' }}>
+    <div className='container'>
       <h2>Transaction History</h2>
       
       <p style={{ marginTop: '1rem', color: '#666' }}>

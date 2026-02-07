@@ -54,7 +54,8 @@ export function ReceivePage() {
   }
 
   return (
-    <div style={{ padding: '1rem' }}>
+    <div 
+    className='container'>
       <h2>Receive Payment</h2>
       
       {!address ? (
@@ -64,7 +65,7 @@ export function ReceivePage() {
           <h3>Payment Request Created</h3>
           <div style={{ 
             padding: '1rem', 
-            background: '#f5f5f5', 
+            background: '#2a5a4f', 
             wordBreak: 'break-all',
             marginTop: '0.5rem'
           }}>
@@ -92,9 +93,9 @@ export function ReceivePage() {
           <div style={{ 
             marginBottom: '1.5rem', 
             padding: '1rem', 
-            background: '#e8f5e9',
+            background: '#2a5a4f',
             borderRadius: '4px',
-            border: '1px solid #4caf50'
+            border: '1px solid #19493e'
           }}>
             <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
               <input
@@ -107,7 +108,7 @@ export function ReceivePage() {
             </label>
             
             {useFreshAddress && !addressConfirmed && (
-              <div style={{ marginTop: '1rem', padding: '0.75rem', background: '#fff', borderRadius: '4px' }}>
+              <div style={{ marginTop: '1rem', padding: '0.75rem', background: '#2a5a4f', borderRadius: '4px' }}>
                 <p style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}>
                   For better privacy, create or switch to a new MetaMask account for this invoice.
                 </p>
@@ -116,7 +117,7 @@ export function ReceivePage() {
                 </p>
                 <button 
                   onClick={() => setAddressConfirmed(true)}
-                  style={{ padding: '0.5rem 1rem', background: '#4caf50', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                  style={{ padding: '0.5rem 1rem', background: '#0c6952', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
                 >
                   ✓ I switched / using fresh address
                 </button>
@@ -124,7 +125,7 @@ export function ReceivePage() {
             )}
 
             {useFreshAddress && addressConfirmed && (
-              <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: '#2e7d32' }}>
+              <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: '#ffffff' }}>
                 ✓ Using address: {address.slice(0, 10)}...{address.slice(-8)}
               </p>
             )}

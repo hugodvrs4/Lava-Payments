@@ -93,14 +93,14 @@ export function PayPage() {
   }
 
   return (
-    <div style={{ padding: '1rem' }}>
+    <div className='container'>
       <h2>Pay Invoice</h2>
       
       {!isConnected ? (
         <p>Please connect your wallet</p>
       ) : !invoice ? (
         <div style={{ marginTop: '1rem' }}>
-          <div style={{ marginBottom: '1rem' }}>
+          <div style={{ display:'flex',justifyContent:'center',marginBottom: '1rem' }}>
             <label>
               Invoice Code:
               <textarea
@@ -108,7 +108,7 @@ export function PayPage() {
                 onChange={(e) => setInvoiceCode(e.target.value)}
                 placeholder="Paste invoice code or scan QR"
                 rows={4}
-                style={{ display: 'block', marginTop: '0.25rem', padding: '0.5rem', width: '100%' }}
+                style={{ display: 'block', marginTop: '0.25rem', padding: '0.5rem', width: '100%',color:'#ffffff',background: 'linear-gradient(135deg, #1e1e1e, #292929)' }}
               />
             </label>
           </div>

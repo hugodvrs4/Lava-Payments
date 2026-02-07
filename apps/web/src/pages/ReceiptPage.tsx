@@ -11,7 +11,7 @@ export function ReceiptPage() {
     <div style={{ padding: '1rem' }}>
       <h2>Payment Receipt</h2>
       
-      <div style={{ marginTop: '1rem', padding: '1rem', background: '#f5f5f5' }}>
+      <div style={{ marginTop: '1rem', padding: '1rem', background: '#2a5a4f' }}>
         <p><strong>Transaction Hash:</strong></p>
         <p style={{ wordBreak: 'break-all', marginTop: '0.5rem' }}>{hash}</p>
         
