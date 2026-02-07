@@ -213,10 +213,6 @@ export function PayPage() {
             Back
           </button>
         </div>
-          >
-            Back
-          </button>
-        </div>
       )}
 
       <button 

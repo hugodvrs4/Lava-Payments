@@ -30,7 +30,7 @@ export const USDT0_DECIMALS = 6;
 // Zero-fee configuration (Plasma paymaster/relayer)
 export const ZERO_FEE_CONFIG = {
   enabled: false, // Set to true when relayer integration is complete
-  relayerUrl: process.env.VITE_PLASMA_RELAYER_URL || '',
+  relayerUrl: '', // Set via environment variable VITE_PLASMA_RELAYER_URL
   // When enabled: transfers sponsored by Plasma paymaster for USDT0
   // See: Plasma "Zero-Fee USDT Transfers" documentation
 } as const;
