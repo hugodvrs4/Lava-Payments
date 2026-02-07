@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   useAccount,
   useWriteContract,
@@ -9,7 +9,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ZERO_FEE_CONFIG } from '@lava-payment/shared'
 import type { InvoicePayload } from '@lava-payment/shared'
 import { PaymentService } from '../services/paymentService'
-import { Html5Qrcode } from 'html5-qrcode'
+import { BrowserQRCodeReader } from '@zxing/browser'
 
 export function PayPage() {
   const { isConnected } = useAccount()
@@ -27,6 +27,10 @@ export function PayPage() {
 
   const { data: hash, writeContract } = useWriteContract()
   const { isLoading: isConfirming } = useWaitForTransactionReceipt({ hash })
+
+  // ZXing refs
+  const readerRef = useRef<BrowserQRCodeReader | null>(null)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
 
   /* ---------------- redirect after tx ---------------- */
   useEffect(() => {
@@ -73,58 +77,75 @@ export function PayPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [invoiceParam])
 
-  /* ---------------- QR camera scan ---------------- */
+  /* ---------------- QR camera scan (ZXing) ---------------- */
   useEffect(() => {
     if (!scanning) return
 
-    const qr = new Html5Qrcode('qr-reader')
     setScanError(null)
 
-    qr.start(
-      { facingMode: 'environment' },
-      { fps: 10, qrbox: { width: 260, height: 260 } },
-      async (decodedText) => {
-        const raw = decodedText.trim()
+    if (!readerRef.current) readerRef.current = new BrowserQRCodeReader()
+    const reader = readerRef.current
 
-        // CASE 1: QR contient une URL /pay?invoice=...
-        if (raw.startsWith('http://') || raw.startsWith('https://')) {
-          try {
-            const url = new URL(raw)
-            const inv = url.searchParams.get('invoice')
-
-            if (url.pathname === '/pay' && inv) {
-              await qr.stop()
-              await qr.clear()
-              setScanning(false)
-
-              const code = decodeURIComponent(inv)
-              setAndDecode(code)
-
-              // optionnel: garder l’URL dans la barre
-              navigate(`/pay?invoice=${encodeURIComponent(inv)}`, { replace: true })
-              return
-            }
-          } catch {}
-        }
-
-        // CASE 2: payload base64 direct
-        await qr.stop()
-        await qr.clear()
-        setScanning(false)
-
-        setAndDecode(raw)
-      },
-      () => {}
-    ).catch((err) => {
-      setScanError(String(err))
+    const videoEl = videoRef.current
+    if (!videoEl) {
+      setScanError('Camera view not ready')
       setScanning(false)
-    })
+      return
+    }
+
+    let stopped = false
+
+    ;(async () => {
+      try {
+        // decodeFromVideoDevice(null, videoEl, cb) -> utilise caméra par défaut
+        await reader.decodeFromVideoDevice(null, videoEl, async (result, err) => {
+          if (stopped) return
+          if (!result) return
+
+          const raw = result.getText().trim()
+
+          // stop scanning ASAP to avoid multiple triggers
+          stopped = true
+          try {
+            reader.reset()
+          } catch {}
+
+          setScanning(false)
+
+          // CASE 1: QR contient une URL /pay?invoice=...
+          if (raw.startsWith('http://') || raw.startsWith('https://')) {
+            try {
+              const url = new URL(raw)
+              const inv = url.searchParams.get('invoice')
+
+              if (url.pathname === '/pay' && inv) {
+                const code = decodeURIComponent(inv)
+                setAndDecode(code)
+
+                navigate(`/pay?invoice=${encodeURIComponent(inv)}`, { replace: true })
+                return
+              }
+            } catch {
+              // si URL invalide -> on tombera en CASE 2
+            }
+          }
+
+          // CASE 2: payload base64 direct
+          setAndDecode(raw)
+        })
+      } catch (e) {
+        setScanError((e as Error).message || String(e))
+        setScanning(false)
+      }
+    })()
 
     return () => {
-      qr.stop().catch(() => {})
-      qr.clear().catch(() => {})
+      stopped = true
+      try {
+        reader.reset()
+      } catch {}
     }
-  }, [scanning, navigate]) // <-- important
+  }, [scanning, navigate])
 
   /* ---------------- manual decode ---------------- */
   const handleDecodeInvoice = () => {
@@ -179,7 +200,15 @@ export function PayPage() {
 
           {scanning && (
             <div style={{ marginTop: '1rem' }}>
-              <div id="qr-reader" style={{ maxWidth: 420 }} />
+              {/* garde ton id pour le style si besoin */}
+              <div id="qr-reader" style={{ maxWidth: 420 }}>
+                <video
+                  ref={videoRef}
+                  style={{ width: '100%', borderRadius: 12 }}
+                  muted
+                  playsInline
+                />
+              </div>
               <p style={{ fontSize: '0.85rem', color: '#666' }}>
                 Autorise la caméra et vise le QR
               </p>
@@ -234,4 +263,3 @@ export function PayPage() {
     </div>
   )
 }
-
