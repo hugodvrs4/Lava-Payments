@@ -173,7 +173,7 @@ export function PayPage() {
   }
 
   return (
-    <div style={{ padding: '1rem' }}>
+    <div className='container'>
       <h2>Pay Invoice</h2>
 
       {!isConnected ? (
@@ -187,7 +187,7 @@ export function PayPage() {
               onChange={(e) => setInvoiceCode(e.target.value)}
               placeholder="Paste invoice code or scan QR"
               rows={4}
-              style={{ width: '100%', marginTop: '0.25rem' }}
+              style={{ width: '100%', marginTop: '0.25rem',background:'linear-gradient(135deg, #1e1e1e, #292929)',color:'#fff' }}
             />
           </label>
 

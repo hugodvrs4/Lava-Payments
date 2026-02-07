@@ -36,6 +36,9 @@
             margin-bottom: auto;
             margin-top: 0;
         }
+        h2{
+            color: #2a5a4f;
+        }
 
         .button-container {
             display: flex;
