@@ -8,7 +8,10 @@ export function WalletConnect() {
   if (isConnected) {
     return (
       <div style={{ padding: '1rem', borderBottom: '1px solid #ccc' }}>
+        <div
+        className='littlebox'>
         <p>Connected: {address?.slice(0, 6)}...{address?.slice(-4)}</p>
+        </div>
         <button onClick={() => disconnect()} style={{ marginTop: '0.5rem' }}>
           Disconnect
         </button>
