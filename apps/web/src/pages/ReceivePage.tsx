@@ -60,7 +60,7 @@ export function ReceivePage() {
   }
 
   return (
-    <div  >
+    <div className='container upgradewidth'  >
       <h2 style={{margin:'0'}}>Receive Payment</h2>
 
       {!address ? (
