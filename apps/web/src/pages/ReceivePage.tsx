@@ -24,8 +24,10 @@ export function ReceivePage() {
   const [useFreshAddress, setUseFreshAddress] = useState(false)
   const [addressConfirmed, setAddressConfirmed] = useState(false)
 
+  const baseUrl = import.meta.env.VITE_PUBLIC_BASE_URL || window.location.origin
+
   const paymentUrl = payload
-    ? `${window.location.origin}/pay?invoice=${encodeURIComponent(payload)}`
+    ? `${baseUrl}/pay?invoice=${encodeURIComponent(payload)}`
     : ''
 
   const handleCreateInvoice = () => {
