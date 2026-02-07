@@ -37,6 +37,9 @@
             margin-top: 0;
         }
 
+        h2{
+            color:#2a5a4f
+        }
         .button-container {
             display: flex;
             flex-direction: column;
