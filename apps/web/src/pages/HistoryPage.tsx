@@ -4,6 +4,7 @@ import { useAccount, useChainId } from 'wagmi'
 import { HistoryService } from '../services/historyService'
 import { PLASMA_NETWORKS } from '@lava-payment/shared'
 import type { PaymentRecord } from '@lava-payment/shared'
+import { plasmaExplorerTx } from '../utils/explorer'
 
 export function HistoryPage() {
   const navigate = useNavigate()
@@ -39,11 +40,6 @@ export function HistoryPage() {
       }
       setHistory([])
     }
-  }
-
-  const getExplorerUrl = (chainId: number, txHash: string): string => {
-    const baseUrl = 'https://explorer.plasma.to'
-    return `${baseUrl}/tx/${txHash}`
   }
 
   const getNetworkName = (chainId: number): string => {
@@ -163,7 +159,7 @@ export function HistoryPage() {
 
                 <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
                   <a
-                    href={getExplorerUrl(record.chainId, record.txHash)}
+                    href={plasmaExplorerTx(record.chainId, record.txHash)}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
@@ -172,7 +168,7 @@ export function HistoryPage() {
                       textDecoration: 'none',
                     }}
                   >
-                    View on Explorer →
+                    View on Plasmascan →
                   </a>
                   <button
                     onClick={() => navigate(`/receipt/${record.txHash}`)}
