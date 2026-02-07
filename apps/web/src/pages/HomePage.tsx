@@ -5,31 +5,25 @@ export function HomePage() {
   const { isConnected } = useAccount()
 
   return (
-    <div style={{ padding: '1rem' }}>
+    <div className="container">
+      <img src="/src/img/logo.png" alt="Lava Payments Logo" style={{ width: '100px', marginBottom: '1rem' }} />
       <h1>Lava Payments</h1>
-      <p style={{ marginTop: '0.5rem', color: '#666' }}>
+      <p style={{ margin: '0', color: '#666' }}>
         Web3 payments on Plasma blockchain
       </p>
 
       {!isConnected && (
-        <p style={{ marginTop: '1rem', padding: '1rem', background: '#fff3cd', borderRadius: '4px' }}>
+        <p style={{ color: '#2a5a4f'}}>
           Connect your wallet to get started
         </p>
       )}
 
       <nav style={{ marginTop: '2rem' }}>
-        <ul style={{ listStyle: 'none' }}>
+        <ul style={{ listStyle: 'none',marginLeft:0 }}>
           <li style={{ marginBottom: '1rem' }}>
             <Link 
               to="/receive" 
-              style={{ 
-                display: 'block',
-                padding: '1rem',
-                background: '#f5f5f5',
-                textDecoration: 'none',
-                color: 'inherit',
-                borderRadius: '4px'
-              }}
+              className="hoverthink"
             >
               <strong>Receive Payment</strong>
               <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.25rem' }}>
@@ -41,14 +35,7 @@ export function HomePage() {
           <li style={{ marginBottom: '1rem' }}>
             <Link 
               to="/pay"
-              style={{ 
-                display: 'block',
-                padding: '1rem',
-                background: '#f5f5f5',
-                textDecoration: 'none',
-                color: 'inherit',
-                borderRadius: '4px'
-              }}
+              className="hoverthink"
             >
               <strong>Pay Invoice</strong>
               <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.25rem' }}>
@@ -60,14 +47,7 @@ export function HomePage() {
           <li style={{ marginBottom: '1rem' }}>
             <Link 
               to="/history"
-              style={{ 
-                display: 'block',
-                padding: '1rem',
-                background: '#f5f5f5',
-                textDecoration: 'none',
-                color: 'inherit',
-                borderRadius: '4px'
-              }}
+              className="hoverthink"
             >
               <strong>History</strong>
               <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.25rem' }}>
