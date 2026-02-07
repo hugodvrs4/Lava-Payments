@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Inclure XRPL.js via CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/xrpl/dist/xrpl.min.js"></script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PayCoin IC - Home</title>
-    <link href="src/index.css" rel="stylesheet">
+    <title>LavaPayment - Home</title>
+    <link href="src/style.css" rel="stylesheet">
 
 </head>
+
 <body>
+        <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script><!--
     <div class="container">
-        <h1>LavaPayments</h1>
+        <h1>LavaPayments </h1>
         <div class="button-container">
             <img src="src/img/logo.png" alt="logo">
             <button onclick="navigateTo('receive.html')">Receive Payment</button>
@@ -20,43 +22,5 @@
         <p id="status">Status: Waiting for action...</p>
     </div>
     
-    <div id="root"></div>
-
-    <script>
-        // Vérifie si XRPL.js est chargé
-        if (typeof xrpl !== "undefined") {
-            console.log("XRPL.js loaded successfully.");
-        } else {
-            console.error("XRPL.js is not loaded. Check the script path.");
-        }
-
-        function navigateTo(page) {
-            window.location.href = page;
-        }
-    </script>
-    
-    <script type="module">
-        import React from 'react';
-        import { createRoot } from 'react-dom/client';
-        import WalletConnect from './components/WalletConnect';
-        import MyComponent from './components/MyComponent';
-
-        const App = () => {
-            return (
-                <div>
-                    <WalletConnect onConnectionChange={(isConnected) => console.log('Connection status:', isConnected)} />
-                    <MyComponent />
-                </div>
-            );
-        };
-
-        const rootElement = document.getElementById('root');
-        if (rootElement) {
-            const root = createRoot(rootElement);
-            root.render(<App />);
-        } else {
-            console.error("L'élément #root n'existe pas dans le DOM !");
-        }
-    </script>
-</body>
+</body>-->
 </html>

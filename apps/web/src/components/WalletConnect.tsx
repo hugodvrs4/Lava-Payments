@@ -23,9 +23,9 @@ export function WalletConnect() {
         <button
           key={connector.id}
           onClick={() => connect({ connector })}
-          style={{ marginTop: '0.5rem', marginRight: '0.5rem' }}
+          
         >
-          Connect {connector.name}
+          Connect Wallet
         </button>
       ))}
     </div>

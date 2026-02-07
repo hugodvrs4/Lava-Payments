@@ -28,6 +28,7 @@
             font-weight: 600;
             color: #2a5a4f;
             margin-bottom: auto;
+            margin-top: 0;
         }
 
         .button-container {
@@ -45,7 +46,7 @@
             width:150px
         }
         button {
-            padding: 20px;
+            padding: 10px;
             border-radius: 12px;
             border: none;
             font-size: 1.4rem;
@@ -60,6 +61,21 @@
             transform: scale(1.05);
             background: linear-gradient(135deg, #00cc77, #00ff96);
         }
+        .hoverthink{
+            display: block;
+            padding: 1rem;
+            background: #2a5a4f;
+            text-decoration: none;
+            color: inherit;
+            border-radius: 12px;
+            margin-right: 10%;
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+        .hoverthink:hover{
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #00cc77, #00ff96);
+        }
+        
 
         #status {
             margin-top: 15px;
