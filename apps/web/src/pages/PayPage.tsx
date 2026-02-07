@@ -4,9 +4,10 @@ import { useNavigate } from 'react-router-dom'
 import { ZERO_FEE_CONFIG } from '@lava-payment/shared'
 import type { InvoicePayload } from '@lava-payment/shared'
 import { PaymentService } from '../services/paymentService'
+import { HistoryService } from '../services/historyService'
 
 export function PayPage() {
-  const { isConnected } = useAccount()
+  const { isConnected, address } = useAccount()
   const chainId = useChainId()
   const navigate = useNavigate()
   const [invoiceCode, setInvoiceCode] = useState('')
@@ -16,7 +17,36 @@ export function PayPage() {
   const [paymentMethod, setPaymentMethod] = useState<'standard' | 'zero-fee'>('standard')
 
   const { data: hash, writeContract } = useWriteContract()
-  const { isLoading: isConfirming } = useWaitForTransactionReceipt({ hash })
+  const { isLoading: isConfirming, isSuccess, isError } = useWaitForTransactionReceipt({ hash })
+
+  // Save transaction to history when hash is available
+  useEffect(() => {
+    if (hash && invoice && address) {
+      // Log transaction as "submitted"
+      HistoryService.addPayment(chainId, address, {
+        txHash: hash,
+        from: address,
+        to: invoice.to,
+        amount: invoice.amount,
+        token: 'USDT0',
+        chainId,
+        invoiceId: invoice.id,
+        note: invoice.memo,
+        expiresAt: invoice.exp,
+      })
+    }
+  }, [hash, invoice, address, chainId])
+
+  // Update status when transaction is confirmed or failed
+  useEffect(() => {
+    if (hash && address) {
+      if (isSuccess) {
+        HistoryService.updatePaymentStatus(chainId, address, hash, 'confirmed')
+      } else if (isError) {
+        HistoryService.updatePaymentStatus(chainId, address, hash, 'failed')
+      }
+    }
+  }, [hash, address, chainId, isSuccess, isError])
 
   // Navigate to receipt page when transaction hash is available
   useEffect(() => {

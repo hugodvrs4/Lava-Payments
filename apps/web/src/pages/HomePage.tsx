@@ -51,7 +51,7 @@ export function HomePage() {
             >
               <strong>History</strong>
               <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.25rem' }}>
-                View past transactions
+                View past transactions (stored locally)
               </p>
             </Link>
           </li>
