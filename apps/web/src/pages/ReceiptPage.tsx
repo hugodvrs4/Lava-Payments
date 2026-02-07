@@ -1,13 +1,13 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useChainId } from 'wagmi'
-import { plasmaExplorerTx } from '../utils/explorer'
+import { explorerTxUrl } from '../utils/explorer'
 
 export function ReceiptPage() {
   const { hash } = useParams<{ hash: string }>()
   const navigate = useNavigate()
   const chainId = useChainId()
 
-  const explorerUrl = hash ? plasmaExplorerTx(chainId, hash) : ''
+  const explorerUrl = hash ? explorerTxUrl(chainId, hash) : ''
 
   return (
     <div style={{ padding: '1rem' }}>

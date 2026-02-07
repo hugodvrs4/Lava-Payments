@@ -3,35 +3,25 @@
  */
 
 /**
- * Get Plasmascan transaction URL for a given chain and transaction hash
+ * Get Plasmascan transaction URL
  * @param chainId - Plasma chain ID (9745 = Mainnet, 9746 = Testnet)
  * @param txHash - Transaction hash
- * @returns Plasmascan URL or empty string if unsupported chain
+ * @returns Plasmascan URL
  */
-export function plasmaExplorerTx(chainId: number, txHash: string): string {
-  switch (chainId) {
-    case 9746: // Plasma Testnet
-      return `https://testnet.plasmascan.to/tx/${txHash}`
-    case 9745: // Plasma Mainnet
-      return `https://plasmascan.to/tx/${txHash}`
-    default:
-      return ''
-  }
+export function explorerTxUrl(chainId: number, txHash: string): string {
+  return chainId === 9746
+    ? `https://testnet.plasmascan.to/tx/${txHash}`
+    : `https://plasmascan.to/tx/${txHash}`
 }
 
 /**
- * Get Plasmascan address URL for a given chain and address
+ * Get Plasmascan address URL
  * @param chainId - Plasma chain ID (9745 = Mainnet, 9746 = Testnet)
  * @param address - Wallet address
- * @returns Plasmascan URL or empty string if unsupported chain
+ * @returns Plasmascan URL
  */
-export function plasmaExplorerAddress(chainId: number, address: string): string {
-  switch (chainId) {
-    case 9746: // Plasma Testnet
-      return `https://testnet.plasmascan.to/address/${address}`
-    case 9745: // Plasma Mainnet
-      return `https://plasmascan.to/address/${address}`
-    default:
-      return ''
-  }
+export function explorerAddressUrl(chainId: number, address: string): string {
+  return chainId === 9746
+    ? `https://testnet.plasmascan.to/address/${address}`
+    : `https://plasmascan.to/address/${address}`
 }
