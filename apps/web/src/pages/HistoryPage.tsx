@@ -74,7 +74,7 @@ export function HistoryPage() {
 
   if (!isConnected) {
     return (
-      <div style={{ padding: '1rem' }}>
+      <div className='container'>
         <h2>Transaction History</h2>
         <p style={{ marginTop: '1rem' }}>Please connect your wallet to view history.</p>
         <button onClick={() => navigate('/')} style={{ marginTop: '2rem' }}>
@@ -85,11 +85,11 @@ export function HistoryPage() {
   }
 
   return (
-    <div style={{ padding: '1rem' }}>
+    <div className='container'>
       <h2>Transaction History</h2>
       
       <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
-        <label style={{ display: 'flex', alignItems: 'center', fontSize: '0.9rem', color: '#666' }}>
+        <label style={{ display: 'flex', alignItems: 'center', fontSize: '0.9rem', color: '#2a5a4f' }}>
           <input
             type="checkbox"
             checked={showAllNetworks}
@@ -101,16 +101,16 @@ export function HistoryPage() {
       </div>
 
       {history.length === 0 ? (
-        <div style={{ padding: '2rem', textAlign: 'center', background: '#f5f5f5', borderRadius: '4px' }}>
-          <p style={{ color: '#666' }}>No transactions yet</p>
-          <p style={{ fontSize: '0.9rem', color: '#888', marginTop: '0.5rem' }}>
+        <div style={{ padding: '2rem', textAlign: 'center', background: '#2a5a4f', borderRadius: '4px' }}>
+          <p style={{ color: '#fff' }}>No transactions yet</p>
+          <p style={{ fontSize: '0.9rem', color: '#fff', marginTop: '0.5rem' }}>
             Your payment history is stored locally and private
           </p>
         </div>
       ) : (
         <>
           <div style={{ marginBottom: '1rem' }}>
-            <p style={{ fontSize: '0.9rem', color: '#666' }}>
+            <p style={{ fontSize: '0.9rem', color: '#fff' }}>
               {history.length} transaction{history.length !== 1 ? 's' : ''} found
             </p>
           </div>
@@ -121,7 +121,7 @@ export function HistoryPage() {
                 key={record.txHash}
                 style={{
                   padding: '1rem',
-                  background: '#fff',
+                  background: '#2a5a4f',
                   border: '1px solid #ddd',
                   borderRadius: '4px',
                 }}
@@ -134,7 +134,7 @@ export function HistoryPage() {
                   }}>
                     {getStatusIcon(record.status)} {record.status.toUpperCase()}
                   </span>
-                  <span style={{ fontSize: '0.85rem', color: '#888' }}>
+                  <span style={{ fontSize: '0.85rem', color: '#fff' }}>
                     {getNetworkName(record.chainId)}
                   </span>
                 </div>
@@ -148,12 +148,12 @@ export function HistoryPage() {
                 </div>
 
                 {record.note && (
-                  <div style={{ fontSize: '0.9rem', marginBottom: '0.25rem', color: '#666' }}>
+                  <div style={{ fontSize: '0.9rem', marginBottom: '0.25rem', color: '#fff' }}>
                     <strong>Note:</strong> {record.note}
                   </div>
                 )}
 
-                <div style={{ fontSize: '0.85rem', color: '#888', marginTop: '0.5rem' }}>
+                <div style={{ fontSize: '0.85rem', color: '#fff', marginTop: '0.5rem' }}>
                   {formatDate(record.createdAt)}
                 </div>
 
@@ -164,7 +164,7 @@ export function HistoryPage() {
                     rel="noopener noreferrer"
                     style={{
                       fontSize: '0.85rem',
-                      color: '#2196f3',
+                      color: '#2a5a4f',
                       textDecoration: 'none',
                     }}
                   >
@@ -176,8 +176,8 @@ export function HistoryPage() {
                       fontSize: '0.85rem',
                       padding: '0.25rem 0.5rem',
                       background: 'transparent',
-                      border: '1px solid #2196f3',
-                      color: '#2196f3',
+                      border: '1px solid #2a5a4f',
+                      color: '#ffffff',
                       borderRadius: '3px',
                       cursor: 'pointer',
                     }}
