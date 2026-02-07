@@ -1,8 +1,12 @@
 export interface InvoicePayload {
-  recipient: string;
+  v: number; // Protocol version
+  chainId: number;
+  token: string; // "USDT0"
+  to: string; // Recipient address
   amount: string;
-  memo?: string;
-  timestamp: number;
+  id: string; // Random UUID
+  exp: number; // Expiry timestamp
+  memo?: string; // Local-only, never sent on-chain
 }
 
 export interface TransactionRecord {
@@ -12,4 +16,5 @@ export interface TransactionRecord {
   memo?: string;
   timestamp: number;
   status: 'pending' | 'confirmed' | 'failed';
+  invoiceId?: string; // Link to invoice for privacy tracking
 }

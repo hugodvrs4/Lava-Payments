@@ -40,15 +40,33 @@ export function PayPage() {
       setError(null)
       const decoded = JSON.parse(atob(invoiceCode))
       
+      // Validate protocol version
+      if (decoded.v !== 1) {
+        setError('Unsupported invoice version')
+        return
+      }
+      
       // Validate required fields
-      if (!decoded.recipient || !decoded.amount || !decoded.timestamp) {
+      if (!decoded.to || !decoded.amount || !decoded.id || !decoded.exp) {
         setError('Invalid invoice: missing required fields')
         return
       }
       
+      // Check if invoice has expired
+      if (decoded.exp < Date.now()) {
+        setError('Invoice has expired')
+        return
+      }
+      
       // Validate recipient is a valid address format
-      if (!/^0x[a-fA-F0-9]{40}$/.test(decoded.recipient)) {
+      if (!/^0x[a-fA-F0-9]{40}$/.test(decoded.to)) {
         setError('Invalid recipient address')
+        return
+      }
+      
+      // Validate chain ID matches Plasma
+      if (decoded.chainId && decoded.chainId !== 9745) {
+        setError('Invoice is for a different network')
         return
       }
       
@@ -64,11 +82,12 @@ export function PayPage() {
     try {
       const amountInUnits = parseUnits(invoice.amount, USDT0_DECIMALS)
       
+      // NOTE: ERC20 transfer only sends (to, amount) - memo is NEVER sent on-chain
       writeContract({
         address: USDT0_ADDRESS,
         abi: ERC20_ABI,
         functionName: 'transfer',
-        args: [invoice.recipient as `0x${string}`, amountInUnits],
+        args: [invoice.to as `0x${string}`, amountInUnits],
       })
     } catch (err) {
       setError('Payment failed: ' + (err as Error).message)
@@ -106,11 +125,15 @@ export function PayPage() {
         <div style={{ marginTop: '1rem' }}>
           <h3>Invoice Details</h3>
           <div style={{ padding: '1rem', background: '#f5f5f5', marginTop: '0.5rem' }}>
-            <p><strong>To:</strong> {invoice.recipient}</p>
+            <p><strong>To:</strong> {invoice.to}</p>
             <p><strong>Amount:</strong> {invoice.amount} USDT0</p>
-            {invoice.memo && <p><strong>Memo:</strong> {invoice.memo}</p>}
-            <p><strong>Created:</strong> {new Date(invoice.timestamp).toLocaleString()}</p>
+            {invoice.memo && <p><strong>Note:</strong> {invoice.memo}</p>}
+            <p><strong>Invoice ID:</strong> {invoice.id}</p>
+            <p><strong>Expires:</strong> {new Date(invoice.exp).toLocaleString()}</p>
           </div>
+          <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem' }}>
+            ℹ️ Only recipient address and amount are sent on-chain. Notes are local-only.
+          </p>
 
           {error && <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>}
 

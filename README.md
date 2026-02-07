@@ -1,17 +1,54 @@
-# Lava Payment
+# Lava Payments
 
-A clean, mobile-first Web3 payments application for the Plasma blockchain. Send and receive USDT0 stablecoin payments with a simple, hackathon-ready interface.
+A clean, mobile-first Web3 payments application for the Plasma blockchain. Send and receive USDT0 stablecoin payments with a simple, **privacy-focused** interface.
 
 ## What It Does
 
-Lava Payment enables peer-to-peer USDT0 (stablecoin) payments on the Plasma blockchain:
+Lava Payments enables peer-to-peer USDT0 (stablecoin) payments on the Plasma blockchain:
 
-- **Receive**: Generate payment requests with QR codes or shareable invoice codes
-- **Pay**: Send USDT0 by pasting or scanning invoice codes
+- **Receive**: Generate payment requests with shareable invoice codes
+- **Pay**: Send USDT0 by pasting invoice codes
 - **Track**: View transaction receipts with direct links to the Plasma block explorer
-- **History**: Local transaction storage (coming soon)
+- **Privacy**: Local-only history, fresh address support, no tracking
 
-All powered by MetaMask wallet connection and direct blockchain interactions—no backend required.
+All powered by MetaMask wallet connection and direct blockchain interactions—**no backend, no accounts, no tracking**.
+
+## Privacy & Confidentiality
+
+### Privacy by Design
+
+Lava Payments is built with privacy as a core principle:
+
+✅ **No Accounts**: No login, email, or registration required  
+✅ **No Backend**: All operations happen client-side in your browser  
+✅ **No Tracking**: No analytics, cookies, or third-party services  
+✅ **No Server Storage**: All data stays on your device  
+✅ **Local History**: Transaction history stored only in your browser's localStorage  
+✅ **No On-Chain Metadata**: Notes/memos are never written to the blockchain
+
+### On-Chain Confidentiality
+
+**Important**: On-chain transfers are public by nature on EVM blockchains like Plasma.
+
+We improve confidentiality through:
+
+- **Fresh Address Support**: Encourages using a new MetaMask account per invoice to prevent transaction linkability
+- **Minimal On-Chain Data**: ERC20 `transfer()` only sends recipient address and amount—no memos, no metadata
+- **Random Invoice IDs**: UUID-based invoice identifiers prevent pattern detection
+- **Invoice Expiry**: 24-hour expiration prevents invoice reuse and reduces linkability
+- **Local-Only Metadata**: Notes, memos, and invoice details never touch the blockchain
+
+**What we cannot do**: We cannot hide transaction amounts, sender/receiver addresses, or timing on-chain without specialized protocols (ZK, confidential transactions). This is an inherent limitation of standard EVM transactions.
+
+### Notes Are Never On-Chain
+
+When you add a memo/note to an invoice:
+- It's included in the shareable invoice code
+- It's displayed to the payer before they send
+- It's stored in your local browser history
+- **It is NEVER sent on-chain**
+
+The blockchain only sees: `transfer(toAddress, amount)` — nothing else.
 
 ## Tech Stack
 
@@ -120,10 +157,15 @@ USDT0 is a stablecoin deployed on Plasma. The app uses standard ERC20 `transfer(
 ### 2. Receive Payment
 
 1. Navigate to "Receive Payment"
-2. Enter the amount in USDT0
-3. Add an optional memo
-4. Click "Create Invoice"
-5. Share the generated code or QR (QR coming soon)
+2. **Optional**: Enable "Use a fresh receiving address" for better privacy
+   - If enabled, create/switch to a new MetaMask account
+   - Click "I switched / using fresh address" to confirm
+3. Enter the amount in USDT0
+4. Add an optional memo (local-only, never sent on-chain)
+5. Click "Create Invoice"
+6. Share the generated invoice code
+
+**Privacy Tip**: Using a fresh address for each invoice prevents others from linking your payments together.
 
 ### 3. Pay an Invoice
 
@@ -168,19 +210,32 @@ pnpm clean
 
 ## Security Notes
 
-- No private keys are stored or transmitted
-- All transactions require MetaMask approval
-- Invoice codes are base64-encoded JSON (not encrypted)
-- Always verify recipient address before paying
+- **No private keys are stored or transmitted**
+- **All transactions require MetaMask approval**
+- **Invoice codes are base64-encoded JSON (not encrypted)**
+- **Always verify recipient address before paying**
+- **No backend or server-side processing**
+- **All data stays local in your browser**
+
+## Privacy Best Practices
+
+For maximum privacy when using Lava Payments:
+
+1. **Use Fresh Addresses**: Create a new MetaMask account for sensitive payments
+2. **Generic Memos**: Use non-identifying notes like "Order #102" instead of personal info
+3. **Share Securely**: Send invoice codes via encrypted channels (Signal, etc.)
+4. **Clear History**: Invoices expire after 24 hours; clear old invoices from localStorage if needed
+5. **Separate Wallets**: Consider using different wallets for different transaction types
 
 ## Future Enhancements
 
 - QR code generation and scanning
-- Local transaction history with localStorage
-- Invoice expiration timestamps
-- Multi-token support
+- Enhanced local transaction history with search/filter
+- Multiple invoice templates
+- Multi-token support (other ERC20s)
 - Transaction notifications
-- Mobile app (React Native)
+- Export history (CSV/JSON)
+- Optional invoice password protection (off-chain)
 
 ## License
 
