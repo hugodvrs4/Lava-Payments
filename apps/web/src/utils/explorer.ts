@@ -9,9 +9,7 @@
  * @returns Plasmascan URL
  */
 export function explorerTxUrl(chainId: number, txHash: string): string {
-  return chainId === 9746
-    ? `https://testnet.plasmascan.to/tx/${txHash}`
-    : `https://plasmascan.to/tx/${txHash}`
+  return `https://testnet.plasmascan.to/tx/${txHash}`
 }
 
 /**
@@ -21,7 +19,5 @@ export function explorerTxUrl(chainId: number, txHash: string): string {
  * @returns Plasmascan URL
  */
 export function explorerAddressUrl(chainId: number, address: string): string {
-  return chainId === 9746
-    ? `https://testnet.plasmascan.to/address/${address}`
-    : `https://plasmascan.to/address/${address}`
+  return `https://testnet.plasmascan.to/address/${address}`
 }

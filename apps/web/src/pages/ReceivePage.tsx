@@ -24,8 +24,10 @@ export function ReceivePage() {
   const [useFreshAddress, setUseFreshAddress] = useState(false)
   const [addressConfirmed, setAddressConfirmed] = useState(false)
 
+  const baseUrl = import.meta.env.VITE_PUBLIC_BASE_URL || window.location.origin
+
   const paymentUrl = payload
-    ? `${window.location.origin}/pay?invoice=${encodeURIComponent(payload)}`
+    ? `${baseUrl}/pay?invoice=${encodeURIComponent(payload)}`
     : ''
 
   const handleCreateInvoice = () => {
@@ -58,7 +60,7 @@ export function ReceivePage() {
   }
 
   return (
-    <div style={{ padding: '1rem' }}>
+    <div  >
       <h2>Receive Payment</h2>
 
       {!address ? (
@@ -74,13 +76,13 @@ export function ReceivePage() {
           }}
         >
           {/* LEFT */}
-          <div>
+          <div className='container upgrade' >
             <h3>Payment Request Created</h3>
 
             <div
               style={{
                 padding: '1rem',
-                background: '#f5f5f5',
+                background: '#2a5a4f',
                 wordBreak: 'break-all',
                 marginTop: '0.5rem',
               }}
