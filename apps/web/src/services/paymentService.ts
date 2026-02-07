@@ -1,10 +1,18 @@
 import { parseUnits } from 'viem'
+<<<<<<< HEAD
 import { USDT0_ADDRESS, USDT0_DECIMALS, ZERO_FEE_CONFIG } from '@lava-payment/shared'
+=======
+import { PLASMA_NETWORKS, USDT0_DECIMALS, ZERO_FEE_CONFIG } from '@lava-payment/shared'
+>>>>>>> 6cbf492e8242931fd5e96526dde4768840f1f620
 
 export interface PaymentParams {
   to: string
   amount: string
   useZeroFee: boolean
+<<<<<<< HEAD
+=======
+  chainId: number
+>>>>>>> 6cbf492e8242931fd5e96526dde4768840f1f620
 }
 
 export interface PaymentResult {
@@ -42,14 +50,34 @@ export class PaymentService {
   ): Promise<{ method: 'standard' | 'zero-fee'; feesPaidBy: 'user' | 'paymaster' }> {
     const amountInUnits = parseUnits(params.amount, USDT0_DECIMALS)
 
+<<<<<<< HEAD
+=======
+    // Get USDT address for the current chain - NO FALLBACK
+    const usdtAddress = PLASMA_NETWORKS[params.chainId as keyof typeof PLASMA_NETWORKS]?.usdt
+    
+    if (!usdtAddress) {
+      throw new Error(`Unsupported network: ${params.chainId}. Please connect to Plasma Mainnet (9745) or Testnet (9746)`)
+    }
+
+    // Log for verification (remove in production)
+    console.log('USDT address used:', usdtAddress)
+    console.log('Network:', PLASMA_NETWORKS[params.chainId as keyof typeof PLASMA_NETWORKS]?.name)
+
+>>>>>>> 6cbf492e8242931fd5e96526dde4768840f1f620
     // If zero-fee is requested and enabled, use paymaster flow
     if (params.useZeroFee && ZERO_FEE_CONFIG.enabled) {
       return this.executeZeroFeeTransfer(params.to, amountInUnits)
     }
 
+<<<<<<< HEAD
     // Fallback to standard ERC20 transfer
     writeContract({
       address: USDT0_ADDRESS,
+=======
+    // Standard ERC20 transfer - address is the USDT CONTRACT, not the recipient
+    writeContract({
+      address: usdtAddress as `0x${string}`,
+>>>>>>> 6cbf492e8242931fd5e96526dde4768840f1f620
       abi: ERC20_ABI,
       functionName: 'transfer',
       args: [params.to as `0x${string}`, amountInUnits],

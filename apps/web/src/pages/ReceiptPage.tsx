@@ -1,30 +1,34 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { PLASMA_CHAIN } from '@lava-payment/shared'
+import { useChainId } from 'wagmi'
+import { explorerTxUrl } from '../utils/explorer'
 
 export function ReceiptPage() {
   const { hash } = useParams<{ hash: string }>()
   const navigate = useNavigate()
+  const chainId = useChainId()
 
-  const explorerUrl = `${PLASMA_CHAIN.blockExplorers.default.url}/tx/${hash}`
+  const explorerUrl = hash ? explorerTxUrl(chainId, hash) : ''
 
   return (
     <div style={{ padding: '1rem' }}>
       <h2>Payment Receipt</h2>
       
-      <div style={{ marginTop: '1rem', padding: '1rem', background: '#2a5a4f' }}>
+      <div style={{ marginTop: '1rem', padding: '1rem', background: '#f5f5f5' }}>
         <p><strong>Transaction Hash:</strong></p>
         <p style={{ wordBreak: 'break-all', marginTop: '0.5rem' }}>{hash}</p>
         
-        <div style={{ marginTop: '1rem' }}>
-          <a 
-            href={explorerUrl} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            style={{ color: '#0066cc' }}
-          >
-            View on Plasma Explorer →
-          </a>
-        </div>
+        {explorerUrl && (
+          <div style={{ marginTop: '1rem' }}>
+            <a 
+              href={explorerUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ color: '#0066cc' }}
+            >
+              View on Plasmascan →
+            </a>
+          </div>
+        )}
       </div>
 
       <button 
