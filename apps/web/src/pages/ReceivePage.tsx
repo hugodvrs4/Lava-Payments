@@ -60,7 +60,7 @@ export function ReceivePage() {
   }
 
   return (
-    <div>
+    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <h2 style={{margin:'0'}}>Receive Payment</h2>
 
       {!address ? (
@@ -201,7 +201,7 @@ export function ReceivePage() {
             </label>
           </div>
 
-          <div style={{ marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center'  }}>
             <label>
               Memo (optional, local-only):
               <input
@@ -217,17 +217,21 @@ export function ReceivePage() {
             </label>
           </div>
         </div>
-          <button
+          <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}} >
+            <button
             onClick={handleCreateInvoice}
             disabled={useFreshAddress && !addressConfirmed}
             style={{
               padding: '0.75rem 1.5rem',
               opacity: useFreshAddress && !addressConfirmed ? 0.5 : 1,
               cursor: useFreshAddress && !addressConfirmed ? 'not-allowed' : 'pointer',
+              
+
             }}
-          >
-            Create Invoice
-          </button>
+            >
+                Create Invoice
+              </button>
+            </div>
         </div>
       )}
 
