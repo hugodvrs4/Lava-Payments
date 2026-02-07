@@ -1,4 +1,4 @@
- :root {
+:root {
   /* Dark theme (default) */
   --bg-gradient-start: #121212;
   --bg-gradient-end: #1f1f1f;
@@ -27,6 +27,102 @@
   --accent-hover-end: #00ff96;
   --shadow-color: rgba(0, 0, 0, 0.1);
 }
+
+[data-theme="custom"] {
+  /* 🎨 VOTRE TROISIÈME THÈME - PERSONNALISEZ LES COULEURS ICI */
+  
+  /* Arrière-plan principal de la page */
+  --bg-gradient-start: #1a1a2e;        /* Couleur de départ du gradient */
+  --bg-gradient-end: #16213e;          /* Couleur de fin du gradient */
+  
+  /* Arrière-plan du container (boîte centrale) */
+  --container-gradient-start: #0f3460; /* Couleur de départ du gradient */
+  --container-gradient-end: #16213e;   /* Couleur de fin du gradient */
+  
+  /* Couleurs de texte */
+  --text-primary: #e94560;             /* Couleur du texte principal */
+  --text-secondary: #f0f0f0;           /* Couleur du texte secondaire */
+  --text-muted: #a0a0a0;               /* Couleur du texte discret (descriptions) */
+  
+  /* Couleur d'accent (boutons, titres) */
+  --accent-color: #e94560;             /* Couleur principale des boutons et titres */
+  
+  /* Couleurs au survol des boutons */
+  --accent-hover-start: #ff6b6b;       /* Couleur de départ du gradient au survol */
+  --accent-hover-end: #ff8e8e;         /* Couleur de fin du gradient au survol */
+  
+  /* Ombre des éléments */
+  --shadow-color: rgba(233, 69, 96, 0.3); /* Couleur de l'ombre (avec transparence) */
+}
+
+/* 
+  📝 EXEMPLES DE PALETTES POUR VOTRE THÈME CUSTOM :
+  
+  🌊 OCÉAN BLEU :
+  --bg-gradient-start: #0a1929;
+  --bg-gradient-end: #1a2332;
+  --container-gradient-start: #1e3a5f;
+  --container-gradient-end: #2a5298;
+  --text-primary: #e3f2fd;
+  --text-secondary: #b3d9ff;
+  --text-muted: #7fa3c3;
+  --accent-color: #00b4d8;
+  --accent-hover-start: #0096c7;
+  --accent-hover-end: #48cae4;
+  --shadow-color: rgba(0, 180, 216, 0.3);
+  
+  🌸 ROSE MODERNE :
+  --bg-gradient-start: #2d1b2e;
+  --bg-gradient-end: #3e2347;
+  --container-gradient-start: #553555;
+  --container-gradient-end: #6d4570;
+  --text-primary: #ffd6ff;
+  --text-secondary: #e7c6ff;
+  --text-muted: #b68cb8;
+  --accent-color: #c77dff;
+  --accent-hover-start: #e0aaff;
+  --accent-hover-end: #f0d9ff;
+  --shadow-color: rgba(199, 125, 255, 0.3);
+  
+  🔥 SUNSET ORANGE :
+  --bg-gradient-start: #1a0f0a;
+  --bg-gradient-end: #2b1810;
+  --container-gradient-start: #3d2314;
+  --container-gradient-end: #5a3321;
+  --text-primary: #ffe4c4;
+  --text-secondary: #ffd4a3;
+  --text-muted: #c9a686;
+  --accent-color: #ff6b35;
+  --accent-hover-start: #ff8c42;
+  --accent-hover-end: #ffa96c;
+  --shadow-color: rgba(255, 107, 53, 0.3);
+  
+  🌿 FORÊT VERTE :
+  --bg-gradient-start: #0d1b0d;
+  --bg-gradient-end: #1a2e1a;
+  --container-gradient-start: #2d4a2d;
+  --container-gradient-end: #3d5e3d;
+  --text-primary: #e8f5e9;
+  --text-secondary: #c8e6c9;
+  --text-muted: #a5d6a7;
+  --accent-color: #4caf50;
+  --accent-hover-start: #66bb6a;
+  --accent-hover-end: #81c784;
+  --shadow-color: rgba(76, 175, 80, 0.3);
+  
+  ⚡ CYBERPUNK JAUNE :
+  --bg-gradient-start: #0f0a0a;
+  --bg-gradient-end: #1a1414;
+  --container-gradient-start: #2b2020;
+  --container-gradient-end: #3d2d2d;
+  --text-primary: #fff44f;
+  --text-secondary: #ffe066;
+  --text-muted: #bfaa3d;
+  --accent-color: #ffdd00;
+  --accent-hover-start: #ffed4e;
+  --accent-hover-end: #fff89a;
+  --shadow-color: rgba(255, 221, 0, 0.4);
+*/
 
 body {
   background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
@@ -155,7 +251,7 @@ button:hover {
   color: var(--text-secondary);
 }
 
-/* Theme toggle button styles */
+/* Theme toggle button */
 .theme-toggle {
   position: fixed;
   top: 20px;
@@ -172,6 +268,7 @@ button:hover {
   font-size: 1.5rem;
   transition: transform 0.3s ease, background 0.3s ease;
   box-shadow: 0px 4px 10px var(--shadow-color);
+  z-index: 1000;
 }
 
 .theme-toggle:hover {
