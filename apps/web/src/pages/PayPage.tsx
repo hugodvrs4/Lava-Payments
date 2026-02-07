@@ -3,6 +3,7 @@ import {
   useAccount,
   useWriteContract,
   useWaitForTransactionReceipt,
+  useChainId,
 } from 'wagmi'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ZERO_FEE_CONFIG } from '@lava-payment/shared'
@@ -13,13 +14,12 @@ export function PayPage() {
   const { isConnected } = useAccount()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const chainId = useChainId()
 
   const [invoiceCode, setInvoiceCode] = useState('')
   const [invoice, setInvoice] = useState<InvoicePayload | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [useZeroFee, setUseZeroFee] = useState(false)
-  const [paymentMethod, setPaymentMethod] =
-    useState<'standard' | 'zero-fee'>('standard')
 
   const { data: hash, writeContract } = useWriteContract()
   const { isLoading: isConfirming } =
@@ -127,16 +127,15 @@ export function PayPage() {
     try {
       setError(null)
 
-      const result = await PaymentService.executeTransfer(
+      await PaymentService.executeTransfer(
         {
           to: invoice.to,
           amount: invoice.amount,
           useZeroFee,
+          chainId,
         },
         writeContract
       )
-
-      setPaymentMethod(result.method)
     } catch (err) {
       setError('Payment failed: ' + (err as Error).message)
     }
