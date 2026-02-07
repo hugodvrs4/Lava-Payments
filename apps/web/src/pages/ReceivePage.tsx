@@ -59,8 +59,8 @@ export function ReceivePage() {
   }
 
   return (
-    <div  >
-      <h2>Receive Payment</h2>
+    <div className='container upgradewidth'  >
+      <h2 style={{margin:'0'}}>Receive Payment</h2>
 
       {!address ? (
         <p>Please connect your wallet</p>
@@ -139,13 +139,8 @@ export function ReceivePage() {
         <div style={{ marginTop: '1rem' }}>
           {/* Privacy: Fresh Address Toggle */}
           <div
-            style={{
-              marginBottom: '1.5rem',
-              padding: '1rem',
-              background: '#e8f5e9',
-              borderRadius: '4px',
-              border: '1px solid #4caf50',
-            }}
+
+            className='hoverthink'
           >
             <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
               <input
@@ -160,7 +155,7 @@ export function ReceivePage() {
             </label>
 
             {useFreshAddress && !addressConfirmed && (
-              <div style={{ marginTop: '1rem', padding: '0.75rem', background: '#fff', borderRadius: '4px' }}>
+              <div style={{ marginTop: '1rem', padding: '0.75rem', background: '#2a5a4f', borderRadius: '4px' }}>
                 <p style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}>
                   For better privacy, create or switch to a new MetaMask account for this invoice.
                 </p>
@@ -171,7 +166,7 @@ export function ReceivePage() {
                   onClick={() => setAddressConfirmed(true)}
                   style={{
                     padding: '0.5rem 1rem',
-                    background: '#4caf50',
+                    background: '#0e8b6e',
                     color: 'white',
                     border: 'none',
                     borderRadius: '4px',
@@ -184,7 +179,7 @@ export function ReceivePage() {
             )}
 
             {useFreshAddress && addressConfirmed && (
-              <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: '#2e7d32' }}>
+              <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: '#fff' }}>
                 ✓ Using address: {address.slice(0, 10)}...{address.slice(-8)}
               </p>
             )}

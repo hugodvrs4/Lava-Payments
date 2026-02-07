@@ -9,6 +9,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ZERO_FEE_CONFIG } from '@lava-payment/shared'
 import type { InvoicePayload } from '@lava-payment/shared'
 import { PaymentService } from '../services/paymentService'
+import { Html5Qrcode } from 'html5-qrcode'
 
 export function PayPage() {
   const { isConnected } = useAccount()
@@ -21,91 +22,33 @@ export function PayPage() {
   const [error, setError] = useState<string | null>(null)
   const [useZeroFee, setUseZeroFee] = useState(false)
 
-  const { data: hash, writeContract } = useWriteContract()
-  const { isLoading: isConfirming } =
-    useWaitForTransactionReceipt({ hash })
+  const [scanning, setScanning] = useState(false)
+  const [scanError, setScanError] = useState<string | null>(null)
 
-  /* --------------------------------------------------
-   * Auto-redirect to receipt after tx
-   * -------------------------------------------------- */
+  const { data: hash, writeContract } = useWriteContract()
+  const { isLoading: isConfirming } = useWaitForTransactionReceipt({ hash })
+
+  /* ---------------- redirect after tx ---------------- */
   useEffect(() => {
-    if (hash) {
-      navigate(`/receipt/${hash}`)
-    }
+    if (hash) navigate(`/receipt/${hash}`)
   }, [hash, navigate])
 
-  /* --------------------------------------------------
-   * Auto-decode invoice from QR (?invoice=...)
-   * -------------------------------------------------- */
-  useEffect(() => {
-    const fromUrl = searchParams.get('invoice')
-    if (!fromUrl) return
-
-    const code = decodeURIComponent(fromUrl)
-    setInvoiceCode(code)
-
+  /* ---------------- decode helpers ---------------- */
+  const decodeAndSetInvoice = (code: string) => {
     try {
       setError(null)
       const decoded = JSON.parse(atob(code))
 
-      if (decoded.v !== 1) {
-        setError('Unsupported invoice version')
-        return
-      }
+      if (decoded.v !== 1) return setError('Unsupported invoice version')
       if (!decoded.to || !decoded.amount || !decoded.id || !decoded.exp) {
-        setError('Invalid invoice: missing required fields')
-        return
+        return setError('Invalid invoice: missing required fields')
       }
-      if (decoded.exp < Date.now()) {
-        setError('Invoice has expired')
-        return
-      }
+      if (decoded.exp < Date.now()) return setError('Invoice has expired')
       if (!/^0x[a-fA-F0-9]{40}$/.test(decoded.to)) {
-        setError('Invalid recipient address')
-        return
+        return setError('Invalid recipient address')
       }
       if (decoded.chainId && decoded.chainId !== 9745) {
-        setError('Invoice is for a different network')
-        return
-      }
-
-      setInvoice(decoded)
-    } catch {
-      setError('Invalid invoice code')
-    }
-  }, [searchParams])
-
-  /* --------------------------------------------------
-   * Manual decode (textarea)
-   * -------------------------------------------------- */
-  const handleDecodeInvoice = () => {
-    try {
-      setError(null)
-      const decoded = JSON.parse(atob(invoiceCode))
-
-      if (decoded.v !== 1) {
-        setError('Unsupported invoice version')
-        return
-      }
-
-      if (!decoded.to || !decoded.amount || !decoded.id || !decoded.exp) {
-        setError('Invalid invoice: missing required fields')
-        return
-      }
-
-      if (decoded.exp < Date.now()) {
-        setError('Invoice has expired')
-        return
-      }
-
-      if (!/^0x[a-fA-F0-9]{40}$/.test(decoded.to)) {
-        setError('Invalid recipient address')
-        return
-      }
-
-      if (decoded.chainId && decoded.chainId !== 9745) {
-        setError('Invoice is for a different network')
-        return
+        return setError('Invoice is for a different network')
       }
 
       setInvoice(decoded)
@@ -114,15 +57,86 @@ export function PayPage() {
     }
   }
 
-  /* --------------------------------------------------
-   * Pay invoice
-   * -------------------------------------------------- */
+  const setAndDecode = (code: string) => {
+    setInvoice(null)
+    setInvoiceCode(code)
+    decodeAndSetInvoice(code)
+  }
+
+  /* ---------------- auto decode from URL ---------------- */
+  const invoiceParam = searchParams.get('invoice')
+
+  useEffect(() => {
+    if (!invoiceParam) return
+    const code = decodeURIComponent(invoiceParam)
+    setAndDecode(code)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [invoiceParam])
+
+  /* ---------------- QR camera scan ---------------- */
+  useEffect(() => {
+    if (!scanning) return
+
+    const qr = new Html5Qrcode('qr-reader')
+    setScanError(null)
+
+    qr.start(
+      { facingMode: 'environment' },
+      { fps: 10, qrbox: { width: 260, height: 260 } },
+      async (decodedText) => {
+        const raw = decodedText.trim()
+
+        // CASE 1: QR contient une URL /pay?invoice=...
+        if (raw.startsWith('http://') || raw.startsWith('https://')) {
+          try {
+            const url = new URL(raw)
+            const inv = url.searchParams.get('invoice')
+
+            if (url.pathname === '/pay' && inv) {
+              await qr.stop()
+              await qr.clear()
+              setScanning(false)
+
+              const code = decodeURIComponent(inv)
+              setAndDecode(code)
+
+              // optionnel: garder l’URL dans la barre
+              navigate(`/pay?invoice=${encodeURIComponent(inv)}`, { replace: true })
+              return
+            }
+          } catch {}
+        }
+
+        // CASE 2: payload base64 direct
+        await qr.stop()
+        await qr.clear()
+        setScanning(false)
+
+        setAndDecode(raw)
+      },
+      () => {}
+    ).catch((err) => {
+      setScanError(String(err))
+      setScanning(false)
+    })
+
+    return () => {
+      qr.stop().catch(() => {})
+      qr.clear().catch(() => {})
+    }
+  }, [scanning, navigate]) // <-- important
+
+  /* ---------------- manual decode ---------------- */
+  const handleDecodeInvoice = () => {
+    setAndDecode(invoiceCode.trim())
+  }
+
+  /* ---------------- pay ---------------- */
   const handlePay = async () => {
     if (!invoice) return
 
     try {
       setError(null)
-
       await PaymentService.executeTransfer(
         {
           to: invoice.to,
@@ -145,116 +159,70 @@ export function PayPage() {
         <p>Please connect your wallet</p>
       ) : !invoice ? (
         <div style={{ marginTop: '1rem' }}>
-          <div style={{ marginBottom: '1rem' }}>
-            <label>
-              Invoice Code:
-              <textarea
-                value={invoiceCode}
-                onChange={(e) => setInvoiceCode(e.target.value)}
-                placeholder="Paste invoice code or scan QR"
-                rows={4}
-                style={{
-                  display: 'block',
-                  marginTop: '0.25rem',
-                  padding: '0.5rem',
-                  width: '100%',
-                }}
-              />
-            </label>
+          <label>
+            Invoice Code:
+            <textarea
+              value={invoiceCode}
+              onChange={(e) => setInvoiceCode(e.target.value)}
+              placeholder="Paste invoice code or scan QR"
+              rows={4}
+              style={{ width: '100%', marginTop: '0.25rem' }}
+            />
+          </label>
+
+          <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
+            <button onClick={() => setScanning((v) => !v)}>
+              {scanning ? 'Stop Scan' : 'Scan QR'}
+            </button>
+            <button onClick={handleDecodeInvoice}>Decode Invoice</button>
           </div>
 
-          {error && (
-            <p style={{ color: 'red', marginBottom: '1rem' }}>{error}</p>
+          {scanning && (
+            <div style={{ marginTop: '1rem' }}>
+              <div id="qr-reader" style={{ maxWidth: 420 }} />
+              <p style={{ fontSize: '0.85rem', color: '#666' }}>
+                Autorise la caméra et vise le QR
+              </p>
+            </div>
           )}
 
-          <button
-            onClick={handleDecodeInvoice}
-            style={{ padding: '0.75rem 1.5rem' }}
-          >
-            Decode Invoice
-          </button>
+          {scanError && <p style={{ color: 'red' }}>{scanError}</p>}
+          {error && <p style={{ color: 'red' }}>{error}</p>}
         </div>
       ) : (
         <div style={{ marginTop: '1rem' }}>
           <h3>Invoice Details</h3>
 
-          <div
-            style={{
-              padding: '1rem',
-              background: '#f5f5f5',
-              marginTop: '0.5rem',
-            }}
-          >
-            <p>
-              <strong>To:</strong> {invoice.to}
-            </p>
-            <p>
-              <strong>Amount:</strong> {invoice.amount} USDT0
-            </p>
-            {invoice.memo && (
-              <p>
-                <strong>Note:</strong> {invoice.memo}
-              </p>
-            )}
-            <p>
-              <strong>Invoice ID:</strong> {invoice.id}
-            </p>
-            <p>
-              <strong>Expires:</strong>{' '}
-              {new Date(invoice.exp).toLocaleString()}
-            </p>
-          </div>
-
-          <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem' }}>
-            ℹ️ Only recipient address and amount are sent on-chain. Notes are
-            local-only.
+          <p>
+            <strong>To:</strong> {invoice.to}
+          </p>
+          <p>
+            <strong>Amount:</strong> {invoice.amount} USDT0
+          </p>
+          <p>
+            <strong>ID:</strong> {invoice.id}
+          </p>
+          <p>
+            <strong>Expires:</strong> {new Date(invoice.exp).toLocaleString()}
           </p>
 
-          {/* Zero-Fee Toggle */}
-          <div
-            style={{
-              marginTop: '1.5rem',
-              padding: '1rem',
-              background: ZERO_FEE_CONFIG.enabled
-                ? '#e3f2fd'
-                : '#fff3cd',
-              borderRadius: '4px',
-              border: `1px solid ${
-                ZERO_FEE_CONFIG.enabled ? '#2196f3' : '#ffc107'
-              }`,
-            }}
-          >
-            <label style={{ display: 'flex', cursor: 'pointer' }}>
+          <div style={{ marginTop: '1rem' }}>
+            <label>
               <input
                 type="checkbox"
                 checked={useZeroFee}
                 onChange={(e) => setUseZeroFee(e.target.checked)}
                 disabled={!ZERO_FEE_CONFIG.enabled}
-                style={{ marginRight: '0.75rem' }}
               />
-              <div>
-                <strong>⚡ Zero-Fee Mode</strong>
-                {!ZERO_FEE_CONFIG.enabled && ' (Integration Ready)'}
-              </div>
+              ⚡ Zero-Fee Mode
             </label>
           </div>
 
-          {error && (
-            <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>
-          )}
-
-          <button
-            onClick={handlePay}
-            disabled={isConfirming}
-            style={{ marginTop: '1rem', padding: '0.75rem 1.5rem' }}
-          >
+          <button onClick={handlePay} disabled={isConfirming}>
             {isConfirming ? 'Confirming…' : 'Pay Invoice'}
           </button>
 
-          <button
-            onClick={() => setInvoice(null)}
-            style={{ marginTop: '1rem', marginLeft: '0.5rem' }}
-          >
+          <button onClick={() => setInvoice(null)} style={{ marginLeft: '0.5rem' }}>
             Back
           </button>
         </div>
@@ -266,3 +234,4 @@ export function PayPage() {
     </div>
   )
 }
+
