@@ -1,22 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { useNavigate } from 'react-router-dom'
-import { parseUnits } from 'viem'
-import { USDT0_ADDRESS, USDT0_DECIMALS } from '@lava-payment/shared'
+import { ZERO_FEE_CONFIG } from '@lava-payment/shared'
 import type { InvoicePayload } from '@lava-payment/shared'
-
-const ERC20_ABI = [
-  {
-    name: 'transfer',
-    type: 'function',
-    stateMutability: 'nonpayable',
-    inputs: [
-      { name: 'to', type: 'address' },
-      { name: 'amount', type: 'uint256' },
-    ],
-    outputs: [{ name: '', type: 'bool' }],
-  },
-] as const
+import { PaymentService } from '../services/paymentService'
 
 export function PayPage() {
   const { isConnected } = useAccount()
@@ -24,6 +11,8 @@ export function PayPage() {
   const [invoiceCode, setInvoiceCode] = useState('')
   const [invoice, setInvoice] = useState<InvoicePayload | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [useZeroFee, setUseZeroFee] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState<'standard' | 'zero-fee'>('standard')
 
   const { data: hash, writeContract } = useWriteContract()
   const { isLoading: isConfirming } = useWaitForTransactionReceipt({ hash })
@@ -80,15 +69,24 @@ export function PayPage() {
     if (!invoice) return
 
     try {
-      const amountInUnits = parseUnits(invoice.amount, USDT0_DECIMALS)
+      setError(null)
       
-      // NOTE: ERC20 transfer only sends (to, amount) - memo is NEVER sent on-chain
-      writeContract({
-        address: USDT0_ADDRESS,
-        abi: ERC20_ABI,
-        functionName: 'transfer',
-        args: [invoice.to as `0x${string}`, amountInUnits],
-      })
+      // Use PaymentService to handle both standard and zero-fee flows
+      const result = await PaymentService.executeTransfer(
+        {
+          to: invoice.to,
+          amount: invoice.amount,
+          useZeroFee,
+        },
+        writeContract
+      )
+      
+      setPaymentMethod(result.method)
+      
+      // If zero-fee was requested but not available, inform user
+      if (useZeroFee && result.method === 'standard') {
+        // User will see fee info in the UI
+      }
     } catch (err) {
       setError('Payment failed: ' + (err as Error).message)
     }
@@ -135,6 +133,69 @@ export function PayPage() {
             ℹ️ Only recipient address and amount are sent on-chain. Notes are local-only.
           </p>
 
+          {/* Zero-Fee Toggle */}
+          <div style={{ 
+            marginTop: '1.5rem', 
+            padding: '1rem', 
+            background: ZERO_FEE_CONFIG.enabled ? '#e3f2fd' : '#fff3cd',
+            borderRadius: '4px',
+            border: `1px solid ${ZERO_FEE_CONFIG.enabled ? '#2196f3' : '#ffc107'}`
+          }}>
+            <label style={{ display: 'flex', alignItems: 'flex-start', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={useZeroFee}
+                onChange={(e) => setUseZeroFee(e.target.checked)}
+                disabled={!ZERO_FEE_CONFIG.enabled}
+                style={{ marginRight: '0.75rem', marginTop: '0.25rem' }}
+              />
+              <div>
+                <div style={{ fontWeight: 'bold', marginBottom: '0.25rem' }}>
+                  ⚡ Zero-Fee Mode {!ZERO_FEE_CONFIG.enabled && '(Integration Ready)'}
+                </div>
+                {ZERO_FEE_CONFIG.enabled ? (
+                  <div style={{ fontSize: '0.9rem' }}>
+                    <p style={{ margin: '0.25rem 0' }}>
+                      ✓ Gas fees paid by Plasma paymaster
+                    </p>
+                    <p style={{ margin: '0.25rem 0', color: '#555' }}>
+                      No PLASMA tokens needed in your wallet
+                    </p>
+                  </div>
+                ) : (
+                  <div style={{ fontSize: '0.9rem', color: '#856404' }}>
+                    <p style={{ margin: '0.25rem 0' }}>
+                      <strong>Standard mode:</strong> You pay gas fees in PLASMA tokens
+                    </p>
+                    <p style={{ margin: '0.25rem 0' }}>
+                      <strong>Zero-fee mode:</strong> Ready to integrate via Plasma paymaster/relayer
+                    </p>
+                    <p style={{ margin: '0.25rem 0', fontSize: '0.85rem' }}>
+                      Architecture supports sponsored transfers when relayer API is configured
+                    </p>
+                  </div>
+                )}
+              </div>
+            </label>
+          </div>
+
+          {/* Fee Status Display */}
+          {hash && (
+            <div style={{ 
+              marginTop: '1rem', 
+              padding: '0.75rem', 
+              background: paymentMethod === 'zero-fee' ? '#e8f5e9' : '#e3f2fd',
+              borderRadius: '4px',
+              fontSize: '0.9rem'
+            }}>
+              {paymentMethod === 'zero-fee' ? (
+                <span>✓ Fees paid by Plasma paymaster</span>
+              ) : (
+                <span>Gas fees paid by you</span>
+              )}
+            </div>
+          )}
+
           {error && <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>}
 
           <button 
@@ -148,6 +209,10 @@ export function PayPage() {
           <button 
             onClick={() => setInvoice(null)}
             style={{ marginTop: '1rem', marginLeft: '0.5rem' }}
+          >
+            Back
+          </button>
+        </div>
           >
             Back
           </button>

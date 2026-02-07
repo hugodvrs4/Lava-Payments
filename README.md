@@ -10,6 +10,7 @@ Lava Payments enables peer-to-peer USDT0 (stablecoin) payments on the Plasma blo
 - **Pay**: Send USDT0 by pasting invoice codes
 - **Track**: View transaction receipts with direct links to the Plasma block explorer
 - **Privacy**: Local-only history, fresh address support, no tracking
+- **Zero-Fee Ready**: Architecture supports Plasma paymaster for sponsored transactions
 
 All powered by MetaMask wallet connection and direct blockchain interactions—**no backend, no accounts, no tracking**.
 
@@ -49,6 +50,56 @@ When you add a memo/note to an invoice:
 - **It is NEVER sent on-chain**
 
 The blockchain only sees: `transfer(toAddress, amount)` — nothing else.
+
+## Zero-Fee Transfers
+
+### Plasma Paymaster Support
+
+Lava Payments is **architecturally ready** to support zero-fee USDT0 transfers via Plasma's paymaster/relayer system.
+
+**Current Mode**: Standard ERC20 transfers (user pays gas in PLASMA tokens)  
+**Zero-Fee Mode**: Ready to integrate when Plasma relayer API is configured
+
+#### How It Works
+
+**Standard Transfer** (Current):
+```
+User → MetaMask → ERC20.transfer() → Plasma Blockchain
+      (user pays gas fees in PLASMA)
+```
+
+**Zero-Fee Transfer** (Integration Ready):
+```
+User → Sign Request → Relayer API → Paymaster → Plasma Blockchain
+                                   (paymaster pays gas)
+      User needs NO PLASMA tokens ✓
+```
+
+#### Key Features
+
+✅ **Service Abstraction**: `PaymentService` handles both standard and zero-fee flows  
+✅ **UI Toggle**: Users can select zero-fee mode when available  
+✅ **Transparent Fees**: App clearly shows who paid fees (user vs paymaster)  
+✅ **Graceful Fallback**: Falls back to standard if relayer unavailable  
+✅ **No Breaking Changes**: Standard mode always works  
+
+#### Integration Status
+
+- [x] Architecture and service layer complete
+- [x] UI toggle and fee status indicators
+- [x] Configuration structure ready
+- [ ] Plasma relayer API integration (requires API access)
+- [ ] Testing on Plasma network
+
+**See**: `docs/ZERO_FEE_INTEGRATION.md` for complete integration guide.
+
+#### Benefits
+
+When zero-fee mode is enabled:
+- Users don't need PLASMA tokens for gas
+- No transaction fees for USDT0 transfers
+- Better UX for onboarding (no need to acquire gas tokens)
+- Sponsored by Plasma paymaster system
 
 ## Tech Stack
 
