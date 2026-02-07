@@ -22,10 +22,9 @@ export function WalletConnect() {
       {connectors.map((connector) => (
         <button
           key={connector.id}
-          onClick={() => connect({ connector })}
-          
+          onClick={() => connect({ connector })}  
         >
-          Connect Wallet
+          Connect {connector.name}
         </button>
       ))}
     </div>
