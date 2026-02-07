@@ -5,6 +5,7 @@ export function HomePage() {
   const { isConnected } = useAccount()
 
   return (
+    
     <div className="container">
       <img src="/src/img/logo.png" alt="Lava Payments Logo" style={{ width: '100px', marginBottom: '1rem' }} />
       <h1>Lava Payments</h1>
