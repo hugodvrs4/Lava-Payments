@@ -85,6 +85,7 @@ export function ReceivePage() {
                 background: '#2a5a4f',
                 wordBreak: 'break-all',
                 marginTop: '0.5rem',
+                borderRadius: '20px',
               }}
             >
               {payload}
