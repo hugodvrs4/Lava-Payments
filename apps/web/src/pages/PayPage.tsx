@@ -10,6 +10,7 @@ import { ZERO_FEE_CONFIG } from '@lava-payment/shared'
 import type { InvoicePayload } from '@lava-payment/shared'
 import { PaymentService } from '../services/paymentService'
 import { BrowserQRCodeReader } from '@zxing/browser'
+import ThemeToggle from "../components/ThemeToggle"
 
 export function PayPage() {
   const { isConnected } = useAccount()
@@ -173,6 +174,8 @@ export function PayPage() {
   }
 
   return (
+        <>
+          <ThemeToggle />
     <div className='container'>
       <h2>Pay Invoice</h2>
 
@@ -261,5 +264,6 @@ export function PayPage() {
         Back to Home
       </button>
     </div>
+    </>
   )
 }

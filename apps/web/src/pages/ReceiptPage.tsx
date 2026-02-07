@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useChainId, useWaitForTransactionReceipt } from 'wagmi'
 import { explorerTxUrl } from '../utils/explorer'
+import ThemeToggle from "../components/ThemeToggle"
 
 export function ReceiptPage() {
   const { hash } = useParams<{ hash: string }>()
@@ -21,6 +22,8 @@ export function ReceiptPage() {
   }
 
   return (
+        <>
+          <ThemeToggle />
     <div style={{ padding: '2rem', maxWidth: '600px', margin: '0 auto' }}>
       <div
         style={{
@@ -115,5 +118,6 @@ export function ReceiptPage() {
         </button>
       </div>
     </div>
+    </>
   )
 }
