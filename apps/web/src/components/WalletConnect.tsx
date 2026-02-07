@@ -19,14 +19,16 @@ export function WalletConnect() {
   return (
     <div style={{ padding: '1rem', borderBottom: '1px solid #ccc' }}>
       <p>Not connected</p>
-      {connectors.map((connector) => (
-        <button
-          key={connector.id}
-          onClick={() => connect({ connector })}  
-        >
-          Connect {connector.name}
-        </button>
-      ))}
+      <button
+        onClick={() => connect({ connector: connectors[0] })}
+        style={{
+          padding: '0.75rem 1.5rem',
+          fontSize: '1rem',
+          cursor: 'pointer',
+        }}
+      >
+        Connect MetaMask
+      </button>
     </div>
   )
 }
