@@ -5,6 +5,7 @@ import { HistoryService } from '../services/historyService'
 import { PLASMA_NETWORKS } from '@lava-payment/shared'
 import type { PaymentRecord } from '@lava-payment/shared'
 import { explorerTxUrl } from '../utils/explorer'
+import ThemeToggle from "../components/ThemeToggle"
 
 export function HistoryPage() {
   const navigate = useNavigate()
@@ -85,6 +86,8 @@ export function HistoryPage() {
   }
 
   return (
+        <>
+          <ThemeToggle />
     <div className='container'>
       <h2>Transaction History</h2>
       
@@ -213,5 +216,6 @@ export function HistoryPage() {
         Back to Home
       </button>
     </div>
+    </>
   )
 }
