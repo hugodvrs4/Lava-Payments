@@ -9,6 +9,21 @@ export interface InvoicePayload {
   memo?: string; // Local-only, never sent on-chain
 }
 
+export interface PaymentRecord {
+  txHash: string;
+  status: 'submitted' | 'confirmed' | 'failed';
+  createdAt: number; // When transaction was submitted
+  confirmedAt?: number; // When transaction was confirmed/failed
+  from: string;
+  to: string;
+  amount: string;
+  token: string;
+  chainId: number;
+  invoiceId?: string;
+  note?: string; // Local-only memo
+  expiresAt?: number;
+}
+
 export interface TransactionRecord {
   hash: string;
   recipient: string;
