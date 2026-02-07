@@ -3,6 +3,8 @@ import { useAccount } from 'wagmi'
 import { useNavigate } from 'react-router-dom'
 import type { InvoicePayload } from '@lava-payment/shared'
 import { PLASMA_CHAIN } from '@lava-payment/shared'
+import { QRCodeCanvas } from 'qrcode.react'
+
 
 // Simple UUID v4 generator
 function generateUUID(): string {
@@ -87,6 +89,36 @@ export function ReceivePage() {
             Create New Invoice
           </button>
         </div>
+        {/* RIGHT (QR + Copy only) */}
+        <div
+          style={{
+            padding: '1rem',
+            background: '#fff',
+            border: '1px solid #eee',
+            borderRadius: '8px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem',
+            alignItems: 'center',
+          }}
+        >
+          <QRCodeCanvas value={paymentUrl || ''} size={240} includeMargin />
+
+          <button
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(paymentUrl || '');
+                alert('Payment link copied');
+              } catch {
+                alert('Failed to copy');
+              }
+            }}
+            style={{ width: '100%', padding: '0.75rem 1rem' }}
+          >
+            Copy Link
+          </button>
+        </div>
+
       ) : (
         <div style={{ marginTop: '1rem' }}>
           {/* Privacy: Fresh Address Toggle */}
