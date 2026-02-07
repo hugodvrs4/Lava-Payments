@@ -66,7 +66,7 @@ export function ReceivePage() {
       {!address ? (
         <p>Please connect your wallet</p>
       ) : payload ? (
-        <div
+        <div 
           style={{
             marginTop: '1rem',
             display: 'grid',
@@ -185,8 +185,10 @@ export function ReceivePage() {
               </p>
             )}
           </div>
-
-          <div style={{ marginBottom: '1rem' }}>
+        <div className='container upgradewidth'>
+          <div 
+        
+          style={{ marginBottom: '1rem' }}>
             <label>
               Amount (USDT0):
               <input
@@ -214,7 +216,7 @@ export function ReceivePage() {
               </small>
             </label>
           </div>
-
+        </div>
           <button
             onClick={handleCreateInvoice}
             disabled={useFreshAddress && !addressConfirmed}
