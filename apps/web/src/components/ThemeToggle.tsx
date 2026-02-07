@@ -3,14 +3,43 @@ import { useEffect, useState } from 'react'
 export default function ThemeToggle() {
   const [theme, setTheme] = useState<'dark' | 'light' | 'custom'>('dark')
 
+  // Function to update favicon
+  const updateFavicon = (currentTheme: 'dark' | 'light' | 'custom') => {
+    const faviconLink = document.querySelector("link[rel~='icon']") as HTMLLinkElement
+    
+    if (!faviconLink) {
+      // Create favicon link if it doesn't exist
+      const newLink = document.createElement('link')
+      newLink.rel = 'icon'
+      document.head.appendChild(newLink)
+    }
+    
+    const link = document.querySelector("link[rel~='icon']") as HTMLLinkElement
+    
+    // Change favicon based on theme
+    switch (currentTheme) {
+      case 'dark':
+        link.href = '/src/img/icone.png'  // Icône pour le thème sombre
+        break
+      case 'light':
+        link.href = '/src/img/logo.png'  // Icône pour le thème clair
+        break
+      case 'custom':
+        link.href = '/src/img/icone-custom.png'  // Icône pour le thème custom
+        break
+    }
+  }
+
   useEffect(() => {
     // Check for saved theme preference or default to 'dark'
     const savedTheme = localStorage.getItem('theme') as 'dark' | 'light' | 'custom' | null
     if (savedTheme) {
       setTheme(savedTheme)
       document.documentElement.setAttribute('data-theme', savedTheme)
+      updateFavicon(savedTheme)
     } else {
       document.documentElement.setAttribute('data-theme', 'dark')
+      updateFavicon('dark')
     }
   }, [])
 
@@ -29,6 +58,7 @@ export default function ThemeToggle() {
     setTheme(newTheme)
     document.documentElement.setAttribute('data-theme', newTheme)
     localStorage.setItem('theme', newTheme)
+    updateFavicon(newTheme)
   }
 
   // Choose icon based on current theme
@@ -39,7 +69,7 @@ export default function ThemeToggle() {
       case 'light':
         return '☀️'  // Sun for light mode
       case 'custom':
-        return '🎨'  // Palette for custom theme
+        return '⚡'  // Palette for custom theme
       default:
         return '🌙'
     }
