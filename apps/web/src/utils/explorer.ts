@@ -9,7 +9,7 @@
  * @returns Plasmascan URL
  */
 export function explorerTxUrl(chainId: number, txHash: string): string {
-  return `https://plasmascan.to/tx/${txHash}`
+  return `https://testnet.plasmascan.to/tx/${txHash}`
 }
 
 /**
@@ -19,5 +19,5 @@ export function explorerTxUrl(chainId: number, txHash: string): string {
  * @returns Plasmascan URL
  */
 export function explorerAddressUrl(chainId: number, address: string): string {
-  return `https://plasmascan.to/address/${address}`
+  return `https://testnet.plasmascan.to/address/${address}`
 }
