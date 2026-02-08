@@ -361,7 +361,7 @@ export function ContactsPage() {
                           onClick={() => handlePayContact(contact.address)}
                           style={{
                             flex: 1,
-                            padding: '0.5rem',2a5a4f
+                            padding: '0.5rem',
                             fontSize: '0.9rem',
                             background: 'white',
                             color: 'var(--accent-color)'
