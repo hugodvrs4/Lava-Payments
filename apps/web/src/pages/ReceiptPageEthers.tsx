@@ -370,7 +370,7 @@ export function ReceiptPageEthers() {
           {/* Block Number */}
           {blockNumber !== null && (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: '#666', fontSize: '0.9rem' }}>Block</span>
+              <span style={{ color: '#2a5a4f', fontSize: '0.9rem' }}>Block</span>
               <code style={{ fontSize: '0.9rem' }}>#{blockNumber}</code>
             </div>
           )}
@@ -378,14 +378,14 @@ export function ReceiptPageEthers() {
           {/* Gas Used */}
           {gasUsed && (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: '#666', fontSize: '0.9rem' }}>Gas Used</span>
+              <span style={{ color: '#2a5a4f', fontSize: '0.9rem' }}>Gas Used</span>
               <code style={{ fontSize: '0.9rem' }}>{gasUsed}</code>
             </div>
           )}
 
           {/* Transaction Hash */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ color: '#666', fontSize: '0.9rem' }}>Transaction</span>
+            <span style={{ color: '#2a5a4f', fontSize: '0.9rem' }}>Transaction</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <code style={{ fontSize: '0.9rem' }}>{truncateHash(transactionHash)}</code>
               <button
