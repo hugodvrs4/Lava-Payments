@@ -132,134 +132,140 @@ export function HistoryPage() {
 
   if (!isConnected) {
     return (
-      <div className='container'>
-        <h2>Transaction History</h2>
-        <p style={{ marginTop: '1rem' }}>Please connect your wallet to view history.</p>
-        <button onClick={() => navigate('/')} style={{ marginTop: '2rem' }}>
-          Back to Home
-        </button>
-      </div>
+      <>
+        <ThemeToggle />
+        <div className='container'>
+          <h2>Transaction History</h2>
+          <p style={{ marginTop: '1rem' }}>Please connect your wallet to view history.</p>
+          <button onClick={() => navigate('/')} style={{ marginTop: '2rem' }}>
+            Back to Home
+          </button>
+        </div>
+      </>
     )
   }
 
   return (
     <>
       <ThemeToggle />
-      <div className='container'>
-        <h2>Transaction History</h2>
-        
-        <div style={{ marginTop: '1rem', marginBottom: '1rem', fontSize: '0.9rem', color: '#fff' }}>
-          <p>Network: {getNetworkName(chainId)}</p>
-          <p>Showing last 5,000 blocks</p>
-        </div>
-
-        {loading && (
-          <div style={{ padding: '2rem', textAlign: 'center', background: '#2a5a4f', borderRadius: '4px' }}>
-            <p style={{ color: '#fff' }}>Loading transactions from blockchain...</p>
+      {/* ✅ Wrapper spécifique pour HistoryPage */}
+      <div className="history-page-wrapper">
+        <div className='history-container'>
+          <h2>Transaction History</h2>
+          
+          <div style={{ marginTop: '1rem', marginBottom: '1rem', fontSize: '0.9rem', color: '#fff' }}>
+            <p>Network: {getNetworkName(chainId)}</p>
+            <p>Showing last 5,000 blocks</p>
           </div>
-        )}
 
-        {error && (
-          <div style={{ padding: '1rem', background: '#f44336', color: 'white', borderRadius: '4px', marginBottom: '1rem' }}>
-            Error: {error}
-          </div>
-        )}
+          {loading && (
+            <div style={{ padding: '2rem', textAlign: 'center', background: '#2a5a4f', borderRadius: '4px' }}>
+              <p style={{ color: '#fff' }}>Loading transactions from blockchain...</p>
+            </div>
+          )}
 
-        {!loading && transactions.length === 0 && (
-          <div style={{ padding: '2rem', textAlign: 'center', background: '#2a5a4f', borderRadius: '4px' }}>
-            <p style={{ color: '#fff' }}>No transactions yet</p>
-            <p style={{ fontSize: '0.9rem', color: '#fff', marginTop: '0.5rem' }}>
-              Your on-chain transaction history will appear here
-            </p>
-          </div>
-        )}
+          {error && (
+            <div style={{ padding: '1rem', background: '#f44336', color: 'white', borderRadius: '4px', marginBottom: '1rem' }}>
+              Error: {error}
+            </div>
+          )}
 
-        {!loading && transactions.length > 0 && (
-          <>
-            <div style={{ marginBottom: '1rem' }}>
-              <p style={{ fontSize: '0.9rem', color: '#fff' }}>
-                {transactions.length} transaction{transactions.length !== 1 ? 's' : ''} found
+          {!loading && transactions.length === 0 && (
+            <div style={{ padding: '2rem', textAlign: 'center', background: '#2a5a4f', borderRadius: '4px' }}>
+              <p style={{ color: '#fff' }}>No transactions yet</p>
+              <p style={{ fontSize: '0.9rem', color: '#fff', marginTop: '0.5rem' }}>
+                Your on-chain transaction history will appear here
               </p>
             </div>
+          )}
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {transactions.map((tx) => (
-                <div
-                  key={tx.hash}
-                  style={{
-                    padding: '1rem',
-                    background: '#2a5a4f',
-                    border: `2px solid ${tx.type === 'received' ? '#4caf50' : '#ff9800'}`,
-                    borderRadius: '4px',
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                    <span
-                      style={{
-                        fontWeight: 'bold',
-                        color: tx.type === 'received' ? '#4caf50' : '#ff9800',
-                        fontSize: '0.9rem',
-                      }}
-                    >
-                      {tx.type === 'received' ? '↓ RECEIVED' : '↑ SENT'}
-                    </span>
-                    <span style={{ fontSize: '0.85rem', color: '#fff' }}>
-                      Block #{tx.blockNumber.toString()}
-                    </span>
+          {!loading && transactions.length > 0 && (
+            <>
+              <div style={{ marginBottom: '1rem' }}>
+                <p style={{ fontSize: '0.9rem', color: '#fff' }}>
+                  {transactions.length} transaction{transactions.length !== 1 ? 's' : ''} found
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {transactions.map((tx) => (
+                  <div
+                    key={tx.hash}
+                    style={{
+                      padding: '1rem',
+                      background: '#2a5a4f',
+                      border: `2px solid ${tx.type === 'received' ? '#4caf50' : '#ff9800'}`,
+                      borderRadius: '4px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                      <span
+                        style={{
+                          fontWeight: 'bold',
+                          color: tx.type === 'received' ? '#4caf50' : '#ff9800',
+                          fontSize: '0.9rem',
+                        }}
+                      >
+                        {tx.type === 'received' ? '↓ RECEIVED' : '↑ SENT'}
+                      </span>
+                      <span style={{ fontSize: '0.85rem', color: '#fff' }}>
+                        Block #{tx.blockNumber.toString()}
+                      </span>
+                    </div>
+
+                    <div style={{ fontSize: '1.1rem', marginBottom: '0.5rem', fontWeight: 'bold', color: '#fff' }}>
+                      {tx.value} USDT0
+                    </div>
+
+                    <div style={{ fontSize: '0.85rem', marginBottom: '0.25rem', color: '#fff' }}>
+                      <strong>From:</strong> {formatAddress(tx.from)}
+                    </div>
+
+                    <div style={{ fontSize: '0.85rem', marginBottom: '0.5rem', color: '#fff' }}>
+                      <strong>To:</strong> {formatAddress(tx.to)}
+                    </div>
+
+                    <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      <a
+                        href={explorerTxUrl(chainId, tx.hash)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          fontSize: '0.85rem',
+                          color: '#ffffff',
+                          textDecoration: 'underline',
+                        }}
+                      >
+                        View on Plasmascan →
+                      </a>
+                      <button
+                        onClick={() => navigate(`/receipt?tx=${tx.hash}`)}
+                        style={{
+                          fontSize: '0.85rem',
+                          padding: '0.25rem 0.5rem',
+                          background: 'transparent',
+                          border: '1px solid #ffffff',
+                          color: '#ffffff',
+                          borderRadius: '3px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        View Receipt
+                      </button>
+                    </div>
                   </div>
+                ))}
+              </div>
+            </>
+          )}
 
-                  <div style={{ fontSize: '1.1rem', marginBottom: '0.5rem', fontWeight: 'bold', color: '#fff' }}>
-                    {tx.value} USDT0
-                  </div>
-
-                  <div style={{ fontSize: '0.85rem', marginBottom: '0.25rem', color: '#fff' }}>
-                    <strong>From:</strong> {formatAddress(tx.from)}
-                  </div>
-
-                  <div style={{ fontSize: '0.85rem', marginBottom: '0.5rem', color: '#fff' }}>
-                    <strong>To:</strong> {formatAddress(tx.to)}
-                  </div>
-
-                  <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
-                    <a
-                      href={explorerTxUrl(chainId, tx.hash)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        fontSize: '0.85rem',
-                        color: '#ffffff',
-                        textDecoration: 'underline',
-                      }}
-                    >
-                      View on Plasmascan →
-                    </a>
-                    <button
-                      onClick={() => navigate(`/receipt?tx=${tx.hash}`)}
-                      style={{
-                        fontSize: '0.85rem',
-                        padding: '0.25rem 0.5rem',
-                        background: 'transparent',
-                        border: '1px solid #ffffff',
-                        color: '#ffffff',
-                        borderRadius: '3px',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      View Receipt
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-
-        <button
-          onClick={() => navigate('/')}
-          style={{ marginTop: '2rem', padding: '0.75rem 1.5rem' }}
-        >
-          Back to Home
-        </button>
+          <button
+            onClick={() => navigate('/')}
+            style={{ marginTop: '2rem', padding: '0.75rem 1.5rem' }}
+          >
+            Back to Home
+          </button>
+        </div>
       </div>
     </>
   )

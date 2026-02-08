@@ -22,7 +22,7 @@ export function HomePage() {
         )}
 
         <nav style={{ marginTop: '5px' }}>
-          <ul style={{ listStyle: 'none', marginLeft: 0 }}>
+          <ul style={{ listStyle: 'none', marginLeft: 0,marginBottom:'0'}}>
             <li style={{ marginBottom: '10px' }}>
               <Link 
                 to="/receive" 

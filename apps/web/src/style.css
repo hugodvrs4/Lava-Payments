@@ -29,33 +29,18 @@
 }
 
 [data-theme="custom"] {
-
-  
- 
   --bg-gradient-start: #2d1a2e;      
-  --bg-gradient-end: #1f1f1f    ;        
-  
- 
+  --bg-gradient-end: #1f1f1f;        
   --container-gradient-start: #3c0541; 
   --container-gradient-end: #16213e;  
-  
-
   --text-primary: #fff;           
   --text-secondary: #f0f0f0;        
   --text-muted: #a0a0a0;              
-  
-
   --accent-color: #2a5a4f;           
-  
- 
   --accent-hover-start: #00cc77;      
   --accent-hover-end: #00ff96;        
-  
-
   --shadow-color: rgba(99, 23, 114, 0.3);
 }
-
-
 
 body {
   background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
@@ -82,6 +67,7 @@ body {
   display: flex;
   flex-direction: column;
   transition: background 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 0;
 }
 
 .littlebox {
@@ -105,7 +91,6 @@ body {
   padding: 40px 67px;
   margin-top: 10px;
 }
-
 
 h1 {
   font-size: 2.2rem;
@@ -219,5 +204,104 @@ button:hover {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* ================================================================
+   HISTORY PAGE - CSS ISOLÉ
+   ================================================================ */
+
+/* ✅ Override du body quand history-page-wrapper est présent */
+body:has(.history-page-wrapper) {
+  display: block;
+  height: auto;
+  min-height: 100vh;
+  padding: 0;
+  overflow-y: auto;
+}
+
+/* Wrapper spécifique pour la page History */
+.history-page-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 6rem;
+  padding-bottom: 2rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* Container spécifique pour History */
+.history-container {
+  background: linear-gradient(135deg, var(--container-gradient-start), var(--container-gradient-end));
+  padding: 40px 20px;
+  border-radius: 20px;
+  box-shadow: 0px 4px 15px var(--shadow-color);
+  text-align: center;
+  animation: fadeIn 0.8s ease;
+  
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  min-height: 400px;
+  
+  display: flex;
+  flex-direction: column;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Scrollbar personnalisée pour le body quand history est actif */
+body:has(.history-page-wrapper)::-webkit-scrollbar {
+  width: 10px;
+}
+
+body:has(.history-page-wrapper)::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+body:has(.history-page-wrapper)::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 10px;
+}
+
+body:has(.history-page-wrapper)::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-hover-start);
+}
+
+/* Responsive pour tablet */
+@media (max-width: 768px) {
+  .history-page-wrapper {
+    padding-top: 5rem;
+    padding-bottom: 1rem;
+  }
+  
+  .history-container {
+    width: 100%;
+    max-width: 100%;
+    padding: 30px 15px;
+    min-height: auto;
+  }
+}
+
+/* Responsive pour mobile */
+@media (max-width: 480px) {
+  .history-page-wrapper {
+    padding-top: 4.5rem;
+    padding-bottom: 0.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  .history-container {
+    width: 100%;
+    padding: 25px 12px;
+    border-radius: 15px;
+  }
+  
+  .history-container h2 {
+    font-size: 1.5rem;
   }
 }
