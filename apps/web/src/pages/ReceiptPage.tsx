@@ -289,7 +289,7 @@ export function ReceiptPage() {
           {receipt?.blockNumber ? (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ color: '#666', fontSize: '0.9rem' }}>Block</span>
-              <code style={{ fontSize: '0.9rem' }}>#{receipt.blockNumber.toString()}</code>
+              <code style={{ fontSize: '0.9rem', color: '#2a5a4f' }}>#{receipt.blockNumber.toString()}</code>
             </div>
           ) : null}
 
@@ -297,7 +297,7 @@ export function ReceiptPage() {
           {receipt?.gasUsed ? (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ color: '#666', fontSize: '0.9rem' }}>Gas Used</span>
-              <code style={{ fontSize: '0.9rem' }}>{receipt.gasUsed.toString()}</code>
+              <code style={{ fontSize: '0.9rem', color: '#2a5a4f' }}>{receipt.gasUsed.toString()}</code>
             </div>
           ) : null}
 
@@ -305,7 +305,7 @@ export function ReceiptPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ color: '#666', fontSize: '0.9rem' }}>Transaction</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <code style={{ fontSize: '0.9rem' }}>{txHash && truncateHash(txHash)}</code>
+              <code style={{ fontSize: '0.9rem', color: '#2a5a4f' }}>{txHash && truncateHash(txHash)}</code>
               {txHash && (
                 <button
                   onClick={() => copyToClipboard(txHash)}
