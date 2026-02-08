@@ -166,8 +166,8 @@ lava-payment/
 npm install -g pnpm
 
 # Clone the repository
-git clone https://github.com/hugodvrs4/Lava-Payment.git
-cd Lava-Payment
+git clone https://github.com/hugodvrs4/Lava-Payments.git
+cd Lava-Payments
 
 # Install dependencies
 pnpm install
