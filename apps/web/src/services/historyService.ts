@@ -1,4 +1,5 @@
 import type { PaymentRecord } from '@lava-payment/shared'
+import { PLASMA_CHAIN, PLASMA_TESTNET_CHAIN } from '@lava-payment/shared'
 
 /**
  * Local storage service for payment history
@@ -113,7 +114,7 @@ export class HistoryService {
     
     try {
       // Check common chain IDs
-      const chainIds = [9745, 9746] // Mainnet, Testnet
+      const chainIds = [PLASMA_CHAIN.id, PLASMA_TESTNET_CHAIN.id] // Mainnet, Testnet
       
       for (const chainId of chainIds) {
         const records = this.getHistory(chainId, address)

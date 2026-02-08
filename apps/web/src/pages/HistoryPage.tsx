@@ -1,45 +1,124 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAccount, useChainId } from 'wagmi'
-import { HistoryService } from '../services/historyService'
-import { PLASMA_NETWORKS } from '@lava-payment/shared'
-import type { PaymentRecord } from '@lava-payment/shared'
+import { createPublicClient, http, parseAbiItem, formatUnits } from 'viem'
+import { PLASMA_NETWORKS, PLASMA_CHAIN, PLASMA_TESTNET_CHAIN } from '@lava-payment/shared'
 import { explorerTxUrl } from '../utils/explorer'
 import ThemeToggle from "../components/ThemeToggle"
+
+interface Transaction {
+  hash: string
+  from: string
+  to: string
+  value: string
+  blockNumber: bigint
+  timestamp?: number
+  type: 'sent' | 'received'
+}
 
 export function HistoryPage() {
   const navigate = useNavigate()
   const { address, isConnected } = useAccount()
   const chainId = useChainId()
-  const [history, setHistory] = useState<PaymentRecord[]>([])
-  const [showAllNetworks, setShowAllNetworks] = useState(false)
+  
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (address) {
-      if (showAllNetworks) {
-        // Load history from all networks
-        const allHistory = HistoryService.getAllHistory(address)
-        const combined = allHistory.flatMap(h => h.records)
-        setHistory(combined.sort((a, b) => b.createdAt - a.createdAt))
-      } else {
-        // Load history for current network only
-        setHistory(HistoryService.getHistory(chainId, address))
-      }
+      loadTransactions()
     }
-  }, [address, chainId, showAllNetworks])
+  }, [address, chainId])
 
-  const handleClearHistory = () => {
+  const loadTransactions = async () => {
     if (!address) return
     
-    if (confirm('Are you sure you want to clear your transaction history? This cannot be undone.')) {
-      if (showAllNetworks) {
-        // Clear all networks
-        HistoryService.clearHistory(9745, address)
-        HistoryService.clearHistory(9746, address)
-      } else {
-        HistoryService.clearHistory(chainId, address)
+    setLoading(true)
+    setError(null)
+
+    try {
+      const rpcUrl = chainId === PLASMA_TESTNET_CHAIN.id 
+        ? 'https://testnet-rpc.plasma.to'
+        : 'https://rpc.plasma.to'
+
+      const client = createPublicClient({
+        chain: chainId === PLASMA_TESTNET_CHAIN.id ? PLASMA_TESTNET_CHAIN : PLASMA_CHAIN,
+        transport: http(rpcUrl),
+      })
+
+      const usdtAddress = PLASMA_NETWORKS[chainId as keyof typeof PLASMA_NETWORKS]?.usdt
+
+      if (!usdtAddress) {
+        throw new Error(`USDT address not found for chain ${chainId}`)
       }
-      setHistory([])
+
+      // Récupérer les événements Transfer (limité à 5000 blocs pour éviter erreur 413)
+      const currentBlock = await client.getBlockNumber()
+      const fromBlock = currentBlock > 5000n ? currentBlock - 5000n : 0n
+
+      // Transactions reçues
+      const receivedLogs = await client.getLogs({
+        address: usdtAddress as `0x${string}`,
+        event: parseAbiItem('event Transfer(address indexed from, address indexed to, uint256 value)'),
+        args: {
+          to: address as `0x${string}`,
+        },
+        fromBlock,
+        toBlock: 'latest',
+      })
+
+      // Transactions envoyées
+      const sentLogs = await client.getLogs({
+        address: usdtAddress as `0x${string}`,
+        event: parseAbiItem('event Transfer(address indexed from, address indexed to, uint256 value)'),
+        args: {
+          from: address as `0x${string}`,
+        },
+        fromBlock,
+        toBlock: 'latest',
+      })
+
+      const allTxs: Transaction[] = []
+
+      // Parser les transactions reçues
+      for (const log of receivedLogs) {
+        allTxs.push({
+          hash: log.transactionHash!,
+          from: log.args.from!,
+          to: log.args.to!,
+          value: formatUnits(log.args.value!, 6), // USDT0 a 6 decimals
+          blockNumber: log.blockNumber!,
+          type: 'received',
+        })
+      }
+
+      // Parser les transactions envoyées
+      for (const log of sentLogs) {
+        allTxs.push({
+          hash: log.transactionHash!,
+          from: log.args.from!,
+          to: log.args.to!,
+          value: formatUnits(log.args.value!, 6),
+          blockNumber: log.blockNumber!,
+          type: 'sent',
+        })
+      }
+
+      // Trier par bloc (plus récent d'abord)
+      allTxs.sort((a, b) => Number(b.blockNumber - a.blockNumber))
+
+      // Dédupliquer par hash
+      const uniqueTxs = Array.from(
+        new Map(allTxs.map(tx => [tx.hash, tx])).values()
+      )
+
+      setTransactions(uniqueTxs)
+    } catch (err) {
+      console.error('Failed to load transactions:', err)
+      setError((err as Error).message)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -47,30 +126,8 @@ export function HistoryPage() {
     return PLASMA_NETWORKS[chainId as keyof typeof PLASMA_NETWORKS]?.name || `Chain ${chainId}`
   }
 
-  const formatDate = (timestamp: number): string => {
-    return new Date(timestamp).toLocaleString()
-  }
-
   const formatAddress = (addr: string): string => {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`
-  }
-
-  const getStatusColor = (status: string): string => {
-    switch (status) {
-      case 'confirmed': return '#4caf50'
-      case 'submitted': return '#ff9800'
-      case 'failed': return '#f44336'
-      default: return '#666'
-    }
-  }
-
-  const getStatusIcon = (status: string): string => {
-    switch (status) {
-      case 'confirmed': return '✓'
-      case 'submitted': return '⏳'
-      case 'failed': return '✗'
-      default: return '?'
-    }
   }
 
   if (!isConnected) {
@@ -86,136 +143,124 @@ export function HistoryPage() {
   }
 
   return (
-        <>
-          <ThemeToggle />
-    <div className='container'>
-      <h2>Transaction History</h2>
-      
-      <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
-        <label style={{ display: 'flex', alignItems: 'center', fontSize: '0.9rem', color: '#2a5a4f' }}>
-          <input
-            type="checkbox"
-            checked={showAllNetworks}
-            onChange={(e) => setShowAllNetworks(e.target.checked)}
-            style={{ marginRight: '0.5rem' }}
-          />
-          Show transactions from all networks
-        </label>
-      </div>
-
-      {history.length === 0 ? (
-        <div style={{ padding: '2rem', textAlign: 'center', background: '#2a5a4f', borderRadius: '4px' }}>
-          <p style={{ color: '#fff' }}>No transactions yet</p>
-          <p style={{ fontSize: '0.9rem', color: '#fff', marginTop: '0.5rem' }}>
-            Your payment history is stored locally and private
-          </p>
+    <>
+      <ThemeToggle />
+      <div className='container'>
+        <h2>Transaction History</h2>
+        
+        <div style={{ marginTop: '1rem', marginBottom: '1rem', fontSize: '0.9rem', color: '#fff' }}>
+          <p>Network: {getNetworkName(chainId)}</p>
+          <p>Showing last 5,000 blocks</p>
         </div>
-      ) : (
-        <>
-          <div style={{ marginBottom: '1rem' }}>
-            <p style={{ fontSize: '0.9rem', color: '#fff' }}>
-              {history.length} transaction{history.length !== 1 ? 's' : ''} found
+
+        {loading && (
+          <div style={{ padding: '2rem', textAlign: 'center', background: '#2a5a4f', borderRadius: '4px' }}>
+            <p style={{ color: '#fff' }}>Loading transactions from blockchain...</p>
+          </div>
+        )}
+
+        {error && (
+          <div style={{ padding: '1rem', background: '#f44336', color: 'white', borderRadius: '4px', marginBottom: '1rem' }}>
+            Error: {error}
+          </div>
+        )}
+
+        {!loading && transactions.length === 0 && (
+          <div style={{ padding: '2rem', textAlign: 'center', background: '#2a5a4f', borderRadius: '4px' }}>
+            <p style={{ color: '#fff' }}>No transactions yet</p>
+            <p style={{ fontSize: '0.9rem', color: '#fff', marginTop: '0.5rem' }}>
+              Your on-chain transaction history will appear here
             </p>
           </div>
+        )}
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {history.map((record) => (
-              <div
-                key={record.txHash}
-                style={{
-                  padding: '1rem',
-                  background: '#2a5a4f',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <span style={{ 
-                    fontWeight: 'bold', 
-                    color: getStatusColor(record.status),
-                    fontSize: '0.9rem'
-                  }}>
-                    {getStatusIcon(record.status)} {record.status.toUpperCase()}
-                  </span>
-                  <span style={{ fontSize: '0.85rem', color: '#fff' }}>
-                    {getNetworkName(record.chainId)}
-                  </span>
-                </div>
+        {!loading && transactions.length > 0 && (
+          <>
+            <div style={{ marginBottom: '1rem' }}>
+              <p style={{ fontSize: '0.9rem', color: '#fff' }}>
+                {transactions.length} transaction{transactions.length !== 1 ? 's' : ''} found
+              </p>
+            </div>
 
-                <div style={{ fontSize: '0.9rem', marginBottom: '0.25rem' }}>
-                  <strong>Amount:</strong> {record.amount} {record.token}
-                </div>
-
-                <div style={{ fontSize: '0.9rem', marginBottom: '0.25rem' }}>
-                  <strong>To:</strong> {formatAddress(record.to)}
-                </div>
-
-                {record.note && (
-                  <div style={{ fontSize: '0.9rem', marginBottom: '0.25rem', color: '#fff' }}>
-                    <strong>Note:</strong> {record.note}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {transactions.map((tx) => (
+                <div
+                  key={tx.hash}
+                  style={{
+                    padding: '1rem',
+                    background: '#2a5a4f',
+                    border: `2px solid ${tx.type === 'received' ? '#4caf50' : '#ff9800'}`,
+                    borderRadius: '4px',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                    <span
+                      style={{
+                        fontWeight: 'bold',
+                        color: tx.type === 'received' ? '#4caf50' : '#ff9800',
+                        fontSize: '0.9rem',
+                      }}
+                    >
+                      {tx.type === 'received' ? '↓ RECEIVED' : '↑ SENT'}
+                    </span>
+                    <span style={{ fontSize: '0.85rem', color: '#fff' }}>
+                      Block #{tx.blockNumber.toString()}
+                    </span>
                   </div>
-                )}
 
-                <div style={{ fontSize: '0.85rem', color: '#fff', marginTop: '0.5rem' }}>
-                  {formatDate(record.createdAt)}
+                  <div style={{ fontSize: '1.1rem', marginBottom: '0.5rem', fontWeight: 'bold', color: '#fff' }}>
+                    {tx.value} USDT0
+                  </div>
+
+                  <div style={{ fontSize: '0.85rem', marginBottom: '0.25rem', color: '#fff' }}>
+                    <strong>From:</strong> {formatAddress(tx.from)}
+                  </div>
+
+                  <div style={{ fontSize: '0.85rem', marginBottom: '0.5rem', color: '#fff' }}>
+                    <strong>To:</strong> {formatAddress(tx.to)}
+                  </div>
+
+                  <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
+                    <a
+                      href={explorerTxUrl(chainId, tx.hash)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        fontSize: '0.85rem',
+                        color: '#ffffff',
+                        textDecoration: 'underline',
+                      }}
+                    >
+                      View on Plasmascan →
+                    </a>
+                    <button
+                      onClick={() => navigate(`/receipt?tx=${tx.hash}`)}
+                      style={{
+                        fontSize: '0.85rem',
+                        padding: '0.25rem 0.5rem',
+                        background: 'transparent',
+                        border: '1px solid #ffffff',
+                        color: '#ffffff',
+                        borderRadius: '3px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      View Receipt
+                    </button>
+                  </div>
                 </div>
+              ))}
+            </div>
+          </>
+        )}
 
-                <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
-                  <a
-                    href={explorerTxUrl(record.chainId, record.txHash)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      fontSize: '0.85rem',
-                      color: '#2a5a4f',
-                      textDecoration: 'none',
-                    }}
-                  >
-                    View on Plasmascan →
-                  </a>
-                  <button
-                    onClick={() => navigate(`/receipt/${record.txHash}`)}
-                    style={{
-                      fontSize: '0.85rem',
-                      padding: '0.25rem 0.5rem',
-                      background: 'transparent',
-                      border: '1px solid #2a5a4f',
-                      color: '#ffffff',
-                      borderRadius: '3px',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    View Receipt
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <button
-            onClick={handleClearHistory}
-            style={{
-              marginTop: '1.5rem',
-              padding: '0.5rem 1rem',
-              background: '#f44336',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-            }}
-          >
-            Clear History
-          </button>
-        </>
-      )}
-
-      <button
-        onClick={() => navigate('/')}
-        style={{ marginTop: '2rem', padding: '0.75rem 1.5rem' }}
-      >
-        Back to Home
-      </button>
-    </div>
+        <button
+          onClick={() => navigate('/')}
+          style={{ marginTop: '2rem', padding: '0.75rem 1.5rem' }}
+        >
+          Back to Home
+        </button>
+      </div>
     </>
   )
 }
