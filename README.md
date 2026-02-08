@@ -6,10 +6,13 @@ A clean, mobile-first Web3 payments application for the Plasma blockchain. Send 
 
 Lava Payments enables peer-to-peer USDT0 (stablecoin) payments on the Plasma blockchain:
 
-- **Receive**: Generate payment requests with shareable invoice codes
-- **Pay**: Send USDT0 by pasting invoice codes
-- **Track**: View transaction receipts with direct links to the Plasma block explorer
-- **Privacy**: Local-only history, fresh address support, no tracking
+- **Receive**: Generate payment requests with shareable invoice codes and QR codes
+- **Pay**: Send USDT0 by pasting invoice codes or scanning QR codes via webcam
+- **Track**: View real-time transaction status with blockchain polling (3-second updates)
+- **History**: See all on-chain transactions (sent & received) directly from blockchain
+- **Contacts**: Save and manage frequently used payment addresses
+- **Multi-Network**: Support for both Plasma Mainnet and Testnet with environment-based switching
+- **Privacy**: Fresh address support, local contacts storage, no tracking
 - **Zero-Fee Ready**: Architecture supports Plasma paymaster for sponsored transactions
 
 All powered by MetaMask wallet connection and direct blockchain interactions—**no backend, no accounts, no tracking**.
@@ -24,7 +27,8 @@ Lava Payments is built with privacy as a core principle:
 ✅ **No Backend**: All operations happen client-side in your browser  
 ✅ **No Tracking**: No analytics, cookies, or third-party services  
 ✅ **No Server Storage**: All data stays on your device  
-✅ **Local History**: Transaction history stored only in your browser's localStorage  
+✅ **On-Chain History**: Transaction history fetched directly from blockchain via RPC  
+✅ **Local Contacts**: Saved addresses stored in browser localStorage only  
 ✅ **No On-Chain Metadata**: Notes/memos are never written to the blockchain
 
 ### On-Chain Confidentiality
@@ -105,9 +109,12 @@ When zero-fee mode is enabled:
 
 - **pnpm workspaces**: Monorepo management
 - **Vite + React + TypeScript**: Fast, modern web app
-- **viem**: Lightweight EVM interactions
-- **wagmi**: React hooks for Ethereum wallets
-- **React Router**: Client-side routing
+- **viem v2**: Lightweight EVM interactions and blockchain queries
+- **wagmi v2**: React hooks for Ethereum wallets (useAccount, useChainId, useWriteContract, etc.)
+- **React Router v6**: Client-side routing
+- **@zxing/browser**: QR code scanning via webcam
+- **qrcode.react**: QR code generation for invoices
+- **ethers.js v6**: Alternative RPC provider (fallback option)
 
 ## Repository Structure
 
@@ -116,19 +123,30 @@ lava-payment/
 ├── apps/
 │   └── web/              # React web application
 │       ├── src/
-│       │   ├── components/  # WalletConnect
-│       │   ├── pages/       # Receive, Pay, Receipt, History
-│       │   ├── config.ts    # wagmi configuration
+│       │   ├── components/  # WalletConnect, ThemeToggle, ContactsDebugPanel
+│       │   ├── pages/       # HomePage, ReceivePage, PayPage, ReceiptPage, 
+│       │   │                # HistoryPage, ContactsPage
+│       │   ├── services/    # PaymentService, ContactService, HistoryService
+│       │   ├── utils/       # explorer.ts (Plasmascan URLs)
+│       │   ├── config.ts    # wagmi + viem configuration (Mainnet + Testnet)
+│       │   ├── vite-env.d.ts # TypeScript declarations for Vite env vars
 │       │   └── main.tsx     # Entry point
+│       ├── .env.local       # Network configuration (VITE_USE_TESTNET)
+│       ├── .env.example     # Environment variables template
 │       └── package.json
 ├── packages/
 │   └── shared/           # Shared types and constants
 │       ├── src/
-│       │   ├── constants.ts # Plasma chain + USDT0 config
-│       │   ├── types.ts     # TypeScript interfaces
+│       │   ├── constants.ts # PLASMA_CHAIN, PLASMA_TESTNET_CHAIN, USDT0 addresses
+│       │   ├── types.ts     # InvoicePayload, PaymentRecord, Contact
 │       │   └── index.ts
 │       └── package.json
-├── docs/                 # Documentation and demo script
+├── docs/                 # Comprehensive documentation
+│   ├── DEMO.md          # Demo script for presentations
+│   ├── FIX_CHAIN_ERROR.md      # ChainNotConfiguredError troubleshooting
+│   ├── NETWORK_CONFIG.md       # Testnet/Mainnet switching guide
+│   ├── TRANSACTION_STATUS_DEBUG.md # Receipt page debugging
+│   └── ZERO_FEE_INTEGRATION.md # Paymaster integration guide
 ├── pnpm-workspace.yaml
 └── package.json
 ```
@@ -179,20 +197,49 @@ pnpm preview
 
 ### Network Configuration
 
+**Plasma Mainnet (Production)**:
 - **Chain ID**: 9745
-- **Network Name**: Plasma
+- **Network Name**: Plasma Mainnet Beta
 - **RPC URL**: https://rpc.plasma.to
-- **Block Explorer**: https://explorer.plasma.to
-- **Currency**: PLASMA
+- **Block Explorer**: https://plasmascan.to
+- **Currency**: XPL (Plasma)
+- **USDT0 Contract**: `0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb`
 
-The app automatically configures MetaMask to use the Plasma network when you connect your wallet.
+**Plasma Testnet (Development)**:
+- **Chain ID**: 9746
+- **Network Name**: Plasma Testnet
+- **RPC URL**: https://testnet-rpc.plasma.to
+- **Block Explorer**: https://testnet.plasmascan.to
+- **Currency**: XPL (Plasma)
+- **USDT0 Contract**: `0x502012b361AebCE43b26Ec812B74D9a51dB4D412`
+
+The app automatically configures MetaMask to use the correct Plasma network based on the `VITE_USE_TESTNET` environment variable.
+
+### Network Switching
+
+To switch between Mainnet and Testnet:
+
+1. Edit `apps/web/.env.local`:
+   ```bash
+   # For Testnet (development)
+   VITE_USE_TESTNET=true
+   
+   # For Mainnet (production)
+   VITE_USE_TESTNET=false
+   ```
+
+2. Restart the dev server: `pnpm dev`
+
+The app uses `ACTIVE_PLASMA_CHAIN` which automatically selects the network based on this setting.
+
+See `docs/NETWORK_CONFIG.md` for detailed configuration guide.
 
 ### USDT0 Token
 
-- **Contract Address**: `0x0000000000000000000000000000000000000000`
 - **Symbol**: USDT0
 - **Decimals**: 6
 - **Type**: ERC20 Stablecoin
+- **Addresses**: Network-specific (see above)
 
 USDT0 is a stablecoin deployed on Plasma. The app uses standard ERC20 `transfer()` calls to send payments.
 
@@ -214,23 +261,60 @@ USDT0 is a stablecoin deployed on Plasma. The app uses standard ERC20 `transfer(
 3. Enter the amount in USDT0
 4. Add an optional memo (local-only, never sent on-chain)
 5. Click "Create Invoice"
-6. Share the generated invoice code
+6. **Share the invoice**:
+   - Copy the invoice code (base64-encoded JSON)
+   - Share the QR code (scan with camera)
+   - Copy the payment link URL
 
 **Privacy Tip**: Using a fresh address for each invoice prevents others from linking your payments together.
 
 ### 3. Pay an Invoice
 
 1. Navigate to "Pay Invoice"
-2. Paste the invoice code (or scan QR in future)
+2. **Enter invoice** by:
+   - Pasting the invoice code
+   - Scanning QR code via webcam (click "Scan QR")
+   - Selecting from saved contacts (click "From Contacts")
 3. Click "Decode Invoice" to preview details
-4. Review recipient, amount, and memo
-5. Click "Pay Invoice"
-6. Approve the transaction in MetaMask
-7. View receipt with transaction hash and explorer link
+4. Review recipient, amount, memo, and network
+5. **Optional**: Save recipient as contact for future payments
+6. Click "Pay Invoice"
+7. Approve the transaction in MetaMask
+8. Redirected to Receipt page with live status tracking
 
-### 4. View History
+### 4. View Transaction Receipt
 
-Transaction history will be stored locally in localStorage (feature planned).
+After payment, the Receipt page shows:
+- **Real-time status updates** (polling every 3 seconds)
+- Transaction hash with Plasmascan link
+- Block number and confirmations
+- Gas used and transaction details
+- Animated progress bar while pending
+- Automatic detection when transaction is confirmed
+
+### 5. View History
+
+Navigate to "History" to see:
+- **All on-chain transactions** (sent & received) from the blockchain
+- Last 5,000 blocks queried via RPC
+- Color-coded: Green for received, Orange for sent
+- Transaction amounts, addresses, and block numbers
+- Direct links to Plasmascan and Receipt page
+- Automatically filtered by connected wallet address
+
+**Note**: History is fetched directly from blockchain Transfer events, not from localStorage.
+
+### 6. Manage Contacts
+
+Navigate to "Contacts" to:
+- **Add new contacts** with name and address
+- View all saved contacts with search and sort
+- Edit contact names
+- Delete contacts
+- **Quick pay**: Select contact when creating payments
+- Contacts stored locally in browser localStorage per wallet address
+
+**Privacy**: Contacts are wallet-specific and never leave your browser.
 
 ## Development
 
@@ -254,10 +338,15 @@ pnpm clean
 
 ### Key Files
 
-- `packages/shared/src/constants.ts`: Plasma chain configuration and USDT0 address
-- `packages/shared/src/types.ts`: TypeScript interfaces for invoices and transactions
-- `apps/web/src/config.ts`: wagmi configuration for wallet connections
-- `apps/web/src/pages/`: All page components (Receive, Pay, Receipt, History, Home)
+- `packages/shared/src/constants.ts`: Plasma Mainnet + Testnet chain configs, USDT0 addresses, network mapping
+- `packages/shared/src/types.ts`: TypeScript interfaces (InvoicePayload, PaymentRecord, Contact)
+- `apps/web/src/config.ts`: wagmi + viem configuration with ACTIVE_PLASMA_CHAIN selector
+- `apps/web/src/pages/`: All page components (HomePage, ReceivePage, PayPage, ReceiptPage, HistoryPage, ContactsPage)
+- `apps/web/src/services/paymentService.ts`: Payment execution with standard/zero-fee abstraction
+- `apps/web/src/services/contactService.ts`: Contact management with localStorage persistence
+- `apps/web/src/services/historyService.ts`: Transaction history utilities (legacy, now using on-chain queries)
+- `apps/web/src/vite-env.d.ts`: TypeScript declarations for Vite environment variables
+- `apps/web/.env.local`: Local environment configuration (VITE_USE_TESTNET)
 
 ## Security Notes
 
@@ -280,13 +369,19 @@ For maximum privacy when using Lava Payments:
 
 ## Future Enhancements
 
-- QR code generation and scanning
-- Enhanced local transaction history with search/filter
+- ✅ ~~QR code generation and scanning~~ (Completed)
+- ✅ ~~Enhanced transaction history with blockchain queries~~ (Completed)
+- ✅ ~~Contact management system~~ (Completed)
+- ✅ ~~Multi-network support (Testnet + Mainnet)~~ (Completed)
+- ✅ ~~Real-time transaction status tracking~~ (Completed)
 - Multiple invoice templates
-- Multi-token support (other ERC20s)
-- Transaction notifications
+- Multi-token support (other ERC20s beyond USDT0)
+- Transaction notifications (browser notifications API)
 - Export history (CSV/JSON)
-- Optional invoice password protection (off-chain)
+- Optional invoice password protection (off-chain encryption)
+- Batch payments (pay multiple invoices at once)
+- Recurring payment support
+- Integration with Plasma paymaster for zero-fee transfers
 
 ## License
 
