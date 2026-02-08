@@ -145,7 +145,7 @@ export function ReceiptPageEthers() {
       <div style={{ padding: '2rem', maxWidth: '600px', margin: '0 auto' }}>
         <div
           style={{
-            background: '#fff',
+            background: '#2a5a4f',
             border: '1px solid #e0e0e0',
             borderRadius: '12px',
             padding: '2rem',
@@ -184,7 +184,7 @@ export function ReceiptPageEthers() {
           style={{
             width: '100%',
             height: '4px',
-            background: '#e0e0e0',
+            background: '#2a5a4f',
             borderRadius: '2px',
             overflow: 'hidden',
             marginBottom: '1rem',
@@ -219,7 +219,7 @@ export function ReceiptPageEthers() {
 
       <div
         style={{
-          background: '#fff',
+          background: '#2a5a4f',
           border: '1px solid #e0e0e0',
           borderRadius: '12px',
           padding: '2rem',
@@ -254,7 +254,7 @@ export function ReceiptPageEthers() {
             <div
               style={{
                 padding: '0.25rem 0.75rem',
-                background: '#f0f0f0',
+                background: '#2a5a4f',
                 color: '#333',
                 borderRadius: '12px',
                 fontSize: '0.7rem',
@@ -288,7 +288,7 @@ export function ReceiptPageEthers() {
             style={{
               marginTop: '1rem',
               padding: '0.75rem',
-              background: '#fff3cd',
+              background: '#2a5a4fd',
               border: '1px solid #ffc107',
               borderRadius: '8px',
               fontSize: '0.85rem',
@@ -306,7 +306,7 @@ export function ReceiptPageEthers() {
             style={{
               marginTop: '1rem',
               padding: '0.75rem',
-              background: '#fee',
+              background: '#2a5a4f',
               border: '1px solid #fcc',
               borderRadius: '8px',
               fontSize: '0.85rem',
@@ -393,8 +393,8 @@ export function ReceiptPageEthers() {
                 style={{
                   padding: '0.25rem 0.5rem',
                   fontSize: '0.8rem',
-                  background: '#f0f0f0',
-                  border: '1px solid #ddd',
+                  background: '#2a5a4f',
+                  border: '1px solid #2a695a',
                   borderRadius: '4px',
                   cursor: 'pointer',
                 }}
@@ -427,7 +427,7 @@ export function ReceiptPageEthers() {
             style={{
               marginTop: '2rem',
               padding: '1rem',
-              background: '#f0f9ff',
+              background: '#2a5a4f',
               border: '1px solid #0891b2',
               borderRadius: '8px',
               display: 'flex',
