@@ -367,7 +367,7 @@ export function ContactsPage() {
                             color: 'var(--accent-color)'
                           }}
                         >
-                          💸 Payer
+                          💸 Pay
                         </button>
                         <button
                           onClick={() => handleEditContact(contact)}
