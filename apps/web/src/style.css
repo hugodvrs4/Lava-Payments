@@ -222,16 +222,12 @@ body:has(.history-page-wrapper) {
 
 /* Wrapper spécifique pour la page History */
 .history-page-wrapper {
-  width: 100%;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding-top: 6rem;
-  padding-bottom: 2rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding: 40px 20px;
 }
 
 /* Container spécifique pour History */
@@ -243,7 +239,7 @@ body:has(.history-page-wrapper) {
   text-align: center;
   animation: fadeIn 0.8s ease;
   
-  width: 90%;
+  width: 80%;
 
   
   display: flex;
