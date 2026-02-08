@@ -208,20 +208,36 @@ button:hover {
 }
 
 /* ================================================================
-   HISTORY PAGE - CSS ISOLÉ
+   ISOLATION CSS POUR PAGES À CONTENU VARIABLE
    ================================================================ */
 
-/* ✅ Override du body quand history-page-wrapper est présent */
-body:has(.history-page-wrapper) {
-  display: block;
+/* On réinitialise le body uniquement quand History ou Receive sont actifs */
+body:has(.history-page-wrapper),
+body:has(.receive-page-wrapper) {
+
   height: auto;
   min-height: 100vh;
   padding: 0;
   overflow-y: auto;
 }
 
-/* Wrapper spécifique pour la page History */
-.history-page-wrapper {
+/* Scrollbar personnalisée pour le body quand une page isolée est active */
+body:has(.history-page-wrapper, .receive-page-wrapper)::-webkit-scrollbar {
+  width: 10px;
+}
+
+body:has(.history-page-wrapper, .receive-page-wrapper)::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+body:has(.history-page-wrapper, .receive-page-wrapper)::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 10px;
+}
+
+/* Wrapper générique pour pages longues */
+.history-page-wrapper,
+.receive-page-wrapper {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -230,7 +246,14 @@ body:has(.history-page-wrapper) {
   padding: 40px 20px;
 }
 
-/* Container spécifique pour History */
+/* Spécifique RECEIVE - Empêche le contenu de déborder */
+.receive-page-wrapper .container {
+  height: auto;
+  min-height: min-content;
+  margin-bottom: 20px;
+}
+
+/* Spécifique HISTORY */
 .history-container {
   background: linear-gradient(135deg, var(--container-gradient-start), var(--container-gradient-end));
   padding: 40px 20px;
@@ -238,70 +261,34 @@ body:has(.history-page-wrapper) {
   box-shadow: 0px 4px 15px var(--shadow-color);
   text-align: center;
   animation: fadeIn 0.8s ease;
-  
-  width: 80%;
-
-  
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+.greener{
+  background-color: #2a5a4f;
 }
 
-/* Scrollbar personnalisée pour le body quand history est actif */
-body:has(.history-page-wrapper)::-webkit-scrollbar {
-  width: 10px;
-}
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
 
-body:has(.history-page-wrapper)::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-body:has(.history-page-wrapper)::-webkit-scrollbar-thumb {
-  background: var(--accent-color);
-  border-radius: 10px;
-}
-
-body:has(.history-page-wrapper)::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-hover-start);
-}
-.case{
-  padding: 1rem;
-  background: #2a5a4f;
-  border-radius: 4px;
-}
-/* Responsive pour tablet */
 @media (max-width: 768px) {
-  .history-page-wrapper {
+  .history-page-wrapper, .receive-page-wrapper {
     padding-top: 5rem;
-    padding-bottom: 1rem;
   }
-  
-  .history-container {
-    width: 80%;
-    padding: 30px 15px;
-
-
-  }
-
+  .history-container { width: 80%; }
 }
-/* Responsive pour mobile */
+
 @media (max-width: 480px) {
-  .history-page-wrapper {
+  .history-page-wrapper, .receive-page-wrapper {
     padding-top: 4.5rem;
-    padding-bottom: 0.5rem;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
   }
-  
-  .history-container {
-    width: 80%;
+  .history-container, .receive-page-wrapper .container {
+    width: 90%;
     padding: 25px 12px;
-    border-radius: 15px;
   }
-  
-  .history-container h2 {
-    font-size: 1.5rem;
-  }
-
 }

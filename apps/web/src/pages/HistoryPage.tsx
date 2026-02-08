@@ -171,7 +171,8 @@ export function HistoryPage() {
           )}
 
           {!loading && transactions.length === 0 && (
-            <div style={{ padding: '2rem', textAlign: 'center', background: '#2a5a4f', borderRadius: '4px' }}>
+            <div
+            style={{ padding: '2rem', textAlign: 'center', background: '#2a5a4f', borderRadius: '4px' }}>
               <p style={{ color: '#fff' }}>No transactions yet</p>
               <p style={{ fontSize: '0.9rem', color: '#fff', marginTop: '0.5rem' }}>
                 Your on-chain transaction history will appear here
@@ -192,7 +193,7 @@ export function HistoryPage() {
                   <div
                     className='case'
                     key={tx.hash}
-                    style={{  border: `2px solid ${tx.type === 'received' ? '#4caf50' : '#ff9800'}` }}
+                    style={{  border: `2px solid ${tx.type === 'received' ? '#4caf50' : '#ff9800'}`,background: '#2a5a4f', padding: '1rem', borderRadius: '8px' }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                       <span
