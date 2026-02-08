@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAccount } from 'wagmi'
 import { ContactService, Contact } from '../services/contactService'
+import { ContactsDebugPanel } from '../components/ContactsDebugPanel'
 import ThemeToggle from '../components/ThemeToggle'
 
 export function ContactsPage() {
@@ -15,9 +16,19 @@ export function ContactsPage() {
   const [editingContact, setEditingContact] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
   const [sortBy, setSortBy] = useState<'name' | 'recent' | 'frequent'>('name')
+  const [showDebug, setShowDebug] = useState(false)
+
+  // Log when address changes
+  useEffect(() => {
+    if (address) {
+      console.log('👤 Wallet connected:', address)
+      console.log('👤 Normalized:', address.toLowerCase())
+    }
+  }, [address])
 
   useEffect(() => {
     if (address) {
+      console.log('📥 Loading contacts for:', address)
       loadContacts()
     }
   }, [address, sortBy])
@@ -36,6 +47,7 @@ export function ContactsPage() {
       loadedContacts.sort((a, b) => a.name.localeCompare(b.name))
     }
     
+    console.log('📥 Loaded contacts:', loadedContacts.length)
     setContacts(loadedContacts)
   }
 
@@ -48,7 +60,9 @@ export function ContactsPage() {
       return
     }
 
+    console.log('➕ Adding contact:', newContactName, newContactAddress)
     ContactService.saveContact(address, newContactAddress, newContactName)
+    
     setNewContactAddress('')
     setNewContactName('')
     setShowAddForm(false)
@@ -63,7 +77,9 @@ export function ContactsPage() {
   const handleSaveEdit = (contactAddress: string) => {
     if (!address || !editName) return
     
+    console.log('✏️ Editing contact:', editName, contactAddress)
     ContactService.saveContact(address, contactAddress, editName)
+    
     setEditingContact(null)
     setEditName('')
     loadContacts()
@@ -73,6 +89,7 @@ export function ContactsPage() {
     if (!address) return
     
     if (confirm(`Êtes-vous sûr de vouloir supprimer le contact "${contactName}" ?`)) {
+      console.log('🗑️ Deleting contact:', contactName, contactAddress)
       ContactService.deleteContact(address, contactAddress)
       loadContacts()
     }
@@ -115,6 +132,22 @@ export function ContactsPage() {
       <div className='container' style={{ maxWidth: '800px', height: 'auto', padding: '2rem' }}>
         <h2>Mes Contacts</h2>
 
+        {/* Debug Toggle Button */}
+        <button
+          onClick={() => setShowDebug(!showDebug)}
+          style={{
+            padding: '0.5rem 1rem',
+            fontSize: '0.85rem',
+            background: showDebug ? '#dc3545' : '#6c757d',
+            marginBottom: '1rem'
+          }}
+        >
+          {showDebug ? '✖ Hide Debug' : '🔍 Show Debug Panel'}
+        </button>
+
+        {/* Debug Panel */}
+        {showDebug && <ContactsDebugPanel />}
+
         {/* Search and Sort */}
         <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
           <input
@@ -123,7 +156,7 @@ export function ContactsPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
-              width: '100%',
+              width: '95%',
               padding: '0.75rem',
               borderRadius: '8px',
               border: '1px solid #ddd',
@@ -196,7 +229,8 @@ export function ContactsPage() {
               value={newContactName}
               onChange={(e) => setNewContactName(e.target.value)}
               style={{
-                width: '100%',
+                
+                width: '95%',
                 padding: '0.75rem',
                 marginBottom: '0.5rem',
                 borderRadius: '8px',
@@ -211,7 +245,7 @@ export function ContactsPage() {
               value={newContactAddress}
               onChange={(e) => setNewContactAddress(e.target.value)}
               style={{
-                width: '100%',
+                width: '95%',
                 padding: '0.75rem',
                 marginBottom: '0.75rem',
                 borderRadius: '8px',
