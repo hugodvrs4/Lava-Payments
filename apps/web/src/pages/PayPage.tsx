@@ -1,18 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import {
+  useAccount,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useChainId,
+  useSwitchChain,
+} from 'wagmi'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ZERO_FEE_CONFIG } from '@lava-payment/shared'
 import type { InvoicePayload } from '@lava-payment/shared'
 import { PaymentService } from '../services/paymentService'
 import { BrowserQRCodeReader } from '@zxing/browser'
-import ThemeToggle from "../components/ThemeToggle"
-
-/**
- * ✅ Default chain for demo/dev:
- * Plasma TESTNET (9746)
- * If invoice has no chainId, we'll assume 9746.
- */
-const DEFAULT_PLASMA_CHAIN_ID = 9746
 
 /** Official Plasma network params */
 const PLASMA_NETWORKS: Record<
@@ -60,22 +58,11 @@ function isChainNotAddedError(err: any) {
   )
 }
 
-/** ✅ Source de vérité : chainId réel du wallet (MetaMask) */
-async function getWalletChainId(): Promise<number | null> {
-  const eth = (window as any).ethereum
-  if (!eth?.request) return null
-  try {
-    const hex = await eth.request({ method: 'eth_chainId' })
-    return typeof hex === 'string' ? parseInt(hex, 16) : null
-  } catch {
-    return null
-  }
-}
-
 export function PayPage() {
   const { isConnected } = useAccount()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const chainId = useChainId()
 
   const [invoiceCode, setInvoiceCode] = useState('')
   const [invoice, setInvoice] = useState<InvoicePayload | null>(null)
@@ -86,45 +73,14 @@ export function PayPage() {
   const [scanError, setScanError] = useState<string | null>(null)
   const [networkError, setNetworkError] = useState<string | null>(null)
 
-  /** ✅ ChainId réel du wallet */
-  const [walletChainId, setWalletChainId] = useState<number | null>(null)
-
   const { data: hash, writeContract } = useWriteContract()
   const { isLoading: isConfirming } = useWaitForTransactionReceipt({ hash })
+
+  const { switchChainAsync, isPending: isSwitching } = useSwitchChain()
 
   // ZXing refs
   const readerRef = useRef<BrowserQRCodeReader | null>(null)
   const videoRef = useRef<HTMLVideoElement | null>(null)
-
-  /* ---------------- keep wallet chainId in sync ---------------- */
-  useEffect(() => {
-    let mounted = true
-    const eth = (window as any).ethereum
-
-    ;(async () => {
-      const id = await getWalletChainId()
-      if (mounted) setWalletChainId(id)
-    })()
-
-    if (eth?.on) {
-      const onChainChanged = (hexId: string) => {
-        const id = parseInt(hexId, 16)
-        setWalletChainId(Number.isFinite(id) ? id : null)
-      }
-      eth.on('chainChanged', onChainChanged)
-
-      return () => {
-        mounted = false
-        try {
-          eth.removeListener('chainChanged', onChainChanged)
-        } catch {}
-      }
-    }
-
-    return () => {
-      mounted = false
-    }
-  }, [])
 
   /* ---------------- redirect after tx ---------------- */
   useEffect(() => {
@@ -148,8 +104,9 @@ export function PayPage() {
         return setError('Invalid recipient address')
       }
 
-      // ✅ If chainId is missing, assume TESTNET for demo/dev
-      if (!decoded.chainId) decoded.chainId = DEFAULT_PLASMA_CHAIN_ID
+      if (decoded.chainId && typeof decoded.chainId !== 'number') {
+        return setError('Invalid invoice: chainId')
+      }
 
       setInvoice(decoded)
     } catch {
@@ -215,6 +172,7 @@ export function PayPage() {
               if (url.pathname === '/pay' && inv) {
                 const code = decodeURIComponent(inv)
                 setAndDecode(code)
+
                 navigate(`/pay?invoice=${encodeURIComponent(inv)}`, { replace: true })
                 return
               }
@@ -246,100 +204,97 @@ export function PayPage() {
   }
 
   /* ---------------- network helpers ---------------- */
-  const invoiceChainId = invoice?.chainId
+  // ✅ FIX: Default to Plasma Mainnet if invoice doesn't specify chainId
+  const invoiceChainId = invoice?.chainId ?? (invoice ? 9745 : undefined)
   const plasmaMeta = getPlasmaNetwork(invoiceChainId ?? undefined)
+  const wrongNetwork = !!invoiceChainId && chainId !== invoiceChainId
 
-  const effectiveWalletChainId = walletChainId // source de vérité
-  const wrongNetwork =
-    !!invoiceChainId && !!effectiveWalletChainId && effectiveWalletChainId !== invoiceChainId
+  // 🔍 DEBUG LOGS
+  console.log('🔍 DEBUG invoice:', invoice)
+  console.log('🔍 DEBUG invoiceChainId:', invoiceChainId)
+  console.log('🔍 DEBUG chainId:', chainId)
+  console.log('🔍 DEBUG wrongNetwork:', wrongNetwork)
 
   const bannerTitle =
-    invoiceChainId === 9746
-      ? 'Please switch to Plasma Testnet to continue'
-      : invoiceChainId === 9745
-        ? 'Please switch to Plasma network to continue'
+    invoiceChainId === 9745
+      ? 'Please switch to Plasma network to continue'
+      : invoiceChainId === 9746
+        ? 'Please switch to Plasma Testnet to continue'
         : 'Please switch network to continue'
 
-  /**
-   * ✅ Switch/add network using MetaMask directly (more reliable than wagmi here)
-   * This guarantees we can switch to 9746 even if wagmi doesn't have the chain configured.
-   */
   const handleSwitchToInvoiceChain = async () => {
     if (!invoiceChainId) return
     setNetworkError(null)
 
-    const eth = (window as any).ethereum
-    if (!eth?.request) {
-      setNetworkError('Wallet provider not found.')
-      return
-    }
-
-    const meta = getPlasmaNetwork(invoiceChainId)
-
     try {
-      // Try switch first
-      await eth.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: '0x' + invoiceChainId.toString(16) }],
-      })
+      await switchChainAsync({ chainId: invoiceChainId })
+      return
     } catch (e: any) {
-      // If not added -> add then switch
-      if (isChainNotAddedError(e) && meta) {
+      // If chain isn't added, try add (only if we have params)
+      if (isChainNotAddedError(e) && plasmaMeta) {
         try {
+          const eth = (window as any).ethereum
+          if (!eth?.request) {
+            setNetworkError('Wallet provider not found.')
+            return
+          }
+
           await eth.request({
             method: 'wallet_addEthereumChain',
             params: [
               {
-                chainId: '0x' + meta.chainId.toString(16),
-                chainName: meta.chainName,
-                nativeCurrency: meta.nativeCurrency,
-                rpcUrls: meta.rpcUrls,
-                blockExplorerUrls: meta.blockExplorerUrls,
+                chainId: '0x' + plasmaMeta.chainId.toString(16),
+                chainName: plasmaMeta.chainName,
+                nativeCurrency: plasmaMeta.nativeCurrency,
+                rpcUrls: plasmaMeta.rpcUrls,
+                blockExplorerUrls: plasmaMeta.blockExplorerUrls,
               },
             ],
           })
 
-          await eth.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: '0x' + invoiceChainId.toString(16) }],
-          })
+          await switchChainAsync({ chainId: invoiceChainId })
+          return
         } catch (addErr: any) {
           setNetworkError(addErr?.message || 'Failed to add/switch network.')
           return
         }
-      } else {
-        setNetworkError(e?.message || 'Failed to switch network.')
-        return
       }
-    }
 
-    const id = await getWalletChainId()
-    setWalletChainId(id)
+      setNetworkError(e?.message || 'Failed to switch network.')
+    }
   }
 
   /* ---------------- pay ---------------- */
   const handlePay = async () => {
     if (!invoice) return
 
-    // ✅ HARD BLOCK based on real MetaMask chainId
-    if (!effectiveWalletChainId) {
-      setNetworkError('Wallet network not detected. Please reload.')
+    // ✅ FIX: Determine target chainId - default to Plasma Mainnet if missing
+    const targetChainId = invoice.chainId ?? 9745
+
+    // ✅ FIX: Enforce Plasma network only (9745 or 9746)
+    if (targetChainId !== 9745 && targetChainId !== 9746) {
+      setError('Invalid invoice: only Plasma networks (9745, 9746) are supported')
       return
     }
-    if (invoice.chainId && effectiveWalletChainId !== invoice.chainId) {
-      setNetworkError('Please switch to Plasma Testnet to continue.')
+
+    // ✅ FIX: Block if user is on wrong network
+    if (chainId !== targetChainId) {
+      setNetworkError(
+        `Please switch to ${PLASMA_NETWORKS[targetChainId]?.displayName || 'Plasma network'} to continue`
+      )
       return
     }
 
     try {
       setError(null)
+      setNetworkError(null)
 
       await PaymentService.executeTransfer(
         {
           to: invoice.to,
           amount: invoice.amount,
           useZeroFee,
-          chainId: invoice.chainId, // ✅ force invoice chain
+          chainId: targetChainId, // ✅ Always use validated Plasma chainId
         },
         writeContract
       )
@@ -348,15 +303,9 @@ export function PayPage() {
     }
   }
 
- return (
-  <>
-    <ThemeToggle />
+  return (
     <div className="container">
       <h2>Pay Invoice</h2>
-      {/* le reste de ton JSX */}
-    </div>
-  </>
-)
 
       {!isConnected ? (
         <p>Please connect your wallet</p>
@@ -424,7 +373,7 @@ export function PayPage() {
                 {bannerTitle}
               </div>
               <div style={{ fontSize: '0.9rem', opacity: 0.85, marginBottom: '0.75rem' }}>
-                Your wallet is on chain {effectiveWalletChainId}, invoice requires chain {invoiceChainId}.
+                Your wallet is on chain {chainId}, invoice requires chain {invoiceChainId}.
               </div>
 
               <button
@@ -463,6 +412,12 @@ export function PayPage() {
             <strong>Expires:</strong> {new Date(invoice.exp).toLocaleString()}
           </p>
 
+          {/* ✅ Show which network this invoice will use */}
+          <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>
+            <strong>Network:</strong>{' '}
+            {PLASMA_NETWORKS[invoiceChainId ?? 9745]?.displayName || `Chain ${invoiceChainId}`}
+          </p>
+
           <div style={{ marginTop: '1rem' }}>
             <label>
               <input
@@ -475,7 +430,7 @@ export function PayPage() {
             </label>
           </div>
 
-          <button onClick={handlePay} disabled={isConfirming || wrongNetwork || !effectiveWalletChainId}>
+          <button onClick={handlePay} disabled={isConfirming || wrongNetwork}>
             {wrongNetwork ? 'Switch network to pay' : isConfirming ? 'Confirming…' : 'Pay Invoice'}
           </button>
 
@@ -491,6 +446,5 @@ export function PayPage() {
         Back to Home
       </button>
     </div>
-    </>
   )
 }
