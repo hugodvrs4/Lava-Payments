@@ -96,7 +96,7 @@ export function ContactsDebugPanel() {
     return (
       <div style={{
         padding: '1rem',
-        background: '#fff3cd',
+        background: '#2a5a4f',
         border: '1px solid #ffc107',
         borderRadius: '8px',
         marginBottom: '1rem'

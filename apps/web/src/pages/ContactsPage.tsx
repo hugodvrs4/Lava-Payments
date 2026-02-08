@@ -88,7 +88,7 @@ export function ContactsPage() {
   const handleDeleteContact = (contactAddress: string, contactName: string) => {
     if (!address) return
     
-    if (confirm(`Êtes-vous sûr de vouloir supprimer le contact "${contactName}" ?`)) {
+    if (confirm(`Are you sure you want to delete the contact "${contactName}" ?`)) {
       console.log('🗑️ Deleting contact:', contactName, contactAddress)
       ContactService.deleteContact(address, contactAddress)
       loadContacts()
@@ -117,10 +117,10 @@ export function ContactsPage() {
   if (!isConnected) {
     return (
       <div className='container'>
-        <h2>Mes Contacts</h2>
-        <p style={{ marginTop: '1rem' }}>Veuillez connecter votre wallet pour gérer vos contacts.</p>
+        <h2>My Contacts</h2>
+        <p style={{ marginTop: '1rem' }}>Please connect your wallet to manage your contacts.</p>
         <button onClick={() => navigate('/')} style={{ marginTop: '2rem' }}>
-          Retour à l'accueil
+          Back to home
         </button>
       </div>
     )
@@ -130,7 +130,7 @@ export function ContactsPage() {
     <>
       <ThemeToggle />
       <div className='container' style={{ maxWidth: '800px', height: 'auto', padding: '2rem' }}>
-        <h2>Mes Contacts</h2>
+        <h2>My Contacts</h2>
 
         {/* Debug Toggle Button */}
         <button
@@ -152,7 +152,7 @@ export function ContactsPage() {
         <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
           <input
             type="text"
-            placeholder="Rechercher par nom ou adresse..."
+            placeholder="Search by name or address"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
@@ -177,7 +177,7 @@ export function ContactsPage() {
                 color: sortBy === 'name' ? 'white' : 'var(--accent-color)'
               }}
             >
-              Par nom
+             By Name
             </button>
             <button
               onClick={() => setSortBy('recent')}
@@ -189,7 +189,7 @@ export function ContactsPage() {
                 color: sortBy === 'recent' ? 'white' : 'var(--accent-color)'
               }}
             >
-              Récents
+              Recents
             </button>
             <button
               onClick={() => setSortBy('frequent')}
@@ -201,7 +201,7 @@ export function ContactsPage() {
                 color: sortBy === 'frequent' ? 'white' : 'var(--accent-color)'
               }}
             >
-              Fréquents
+              Frequent
             </button>
           </div>
         </div>
@@ -211,7 +211,7 @@ export function ContactsPage() {
           onClick={() => setShowAddForm(!showAddForm)}
           style={{ width: '100%', marginBottom: '1rem' }}
         >
-          {showAddForm ? '✕ Annuler' : '➕ Ajouter un contact'}
+          {showAddForm ? '✕ Cancel' : '➕ Add a contact'}
         </button>
 
         {/* Add Contact Form */}
@@ -222,10 +222,10 @@ export function ContactsPage() {
             borderRadius: '12px',
             marginBottom: '1rem'
           }}>
-            <h3 style={{ marginTop: 0, color: 'white' }}>Nouveau contact</h3>
+            <h3 style={{ marginTop: 0, color: 'white' }}>New contact</h3>
             <input
               type="text"
-              placeholder="Nom du contact"
+              placeholder="Contact name"
               value={newContactName}
               onChange={(e) => setNewContactName(e.target.value)}
               style={{
@@ -258,7 +258,7 @@ export function ContactsPage() {
               onClick={handleAddContact}
               style={{ width: '100%', background: 'white', color: 'var(--accent-color)' }}
             >
-              Enregistrer
+              Save 
             </button>
           </div>
         )}
@@ -273,10 +273,10 @@ export function ContactsPage() {
             color: 'white'
           }}>
             <p style={{ color: 'white' }}>
-              {searchQuery ? 'Aucun contact trouvé' : 'Aucun contact enregistré'}
+              {searchQuery ? 'No contacts found for your search.' : 'You have no contacts yet.'}
             </p>
             <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.8)', marginTop: '0.5rem' }}>
-              Les contacts sont stockés localement sur votre appareil
+              Contacts are saved locally in your browser and are only accessible to you. Add your first contact to get started!
             </p>
           </div>
         ) : (
@@ -319,7 +319,7 @@ export function ContactsPage() {
                           onClick={() => handleSaveEdit(contact.address)}
                           style={{ flex: 1, padding: '0.5rem', fontSize: '0.9rem' }}
                         >
-                          ✓ Enregistrer
+                          ✓ Save
                         </button>
                         <button
                           onClick={() => {
@@ -335,7 +335,7 @@ export function ContactsPage() {
                             color: 'white'
                           }}
                         >
-                          ✕ Annuler
+                          ✕ Cancel
                         </button>
                       </div>
                     </div>
@@ -406,7 +406,7 @@ export function ContactsPage() {
           onClick={() => navigate('/')}
           style={{ marginTop: '2rem', width: '100%' }}
         >
-          Retour à l'accueil
+          Back to home  
         </button>
       </div>
     </>

@@ -150,7 +150,7 @@ export function ReceivePage() {
                 type="checkbox"
                 checked={useFreshAddress}
                 onChange={handleFreshAddressToggle}
-                style={{ marginRight: '0.5rem' }}
+                style={{ marginRight: '0.5rem'}}
               />
               <span style={{ fontWeight: 'bold' }}>
                 🔒 Use a fresh receiving address (recommended for privacy)
@@ -187,7 +187,8 @@ export function ReceivePage() {
               </p>
             )}
           </div>
-        <div className='container upgradewidth'>
+        <div className='container upgradewidth'
+        style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem',marginBottom: '2rem' }}>
           <div 
         
           style={{ marginBottom: '1rem' }}>
