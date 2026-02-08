@@ -359,16 +359,7 @@ export function PayPage() {
 
           {/* ⭐ Auto network check & guidance */}
           {wrongNetwork && (
-            <div
-              style={{
-                marginTop: '0.75rem',
-                marginBottom: '1rem',
-                padding: '0.9rem 1rem',
-                borderRadius: '12px',
-                border: '1px solid rgba(255,255,255,0.12)',
-                background: 'rgba(255, 106, 61, 0.10)',
-              }}
-            >
+            <div>
               <div style={{ fontWeight: 700, marginBottom: '0.25rem' }}>
                 {bannerTitle}
               </div>
@@ -400,13 +391,13 @@ export function PayPage() {
           )}
 
           <p>
-            <strong>To:</strong> {invoice.to}
+            <strong>To:</strong> <div style={{ wordBreak: 'break-all',fontSize:'0.9rem' }}>{invoice.to}</div>
           </p>
           <p>
             <strong>Amount:</strong> {invoice.amount} USDT0
           </p>
           <p>
-            <strong>ID:</strong> {invoice.id}
+            <strong>ID:</strong> <div style={{ wordBreak: 'break-all',fontSize:'0.9rem' }}>{invoice.id}</div>
           </p>
           <p>
             <strong>Expires:</strong> {new Date(invoice.exp).toLocaleString()}
