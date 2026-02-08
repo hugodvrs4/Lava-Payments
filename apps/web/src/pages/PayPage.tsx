@@ -5,6 +5,7 @@ import { ZERO_FEE_CONFIG } from '@lava-payment/shared'
 import type { InvoicePayload } from '@lava-payment/shared'
 import { PaymentService } from '../services/paymentService'
 import { BrowserQRCodeReader } from '@zxing/browser'
+import ThemeToggle from "../components/ThemeToggle"
 
 /**
  * ✅ Default chain for demo/dev:
@@ -347,9 +348,15 @@ export function PayPage() {
     }
   }
 
-  return (
+ return (
+  <>
+    <ThemeToggle />
     <div className="container">
       <h2>Pay Invoice</h2>
+      {/* le reste de ton JSX */}
+    </div>
+  </>
+)
 
       {!isConnected ? (
         <p>Please connect your wallet</p>
@@ -484,5 +491,6 @@ export function PayPage() {
         Back to Home
       </button>
     </div>
+    </>
   )
 }

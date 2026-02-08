@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import type { InvoicePayload } from '@lava-payment/shared'
 import { PLASMA_CHAIN } from '@lava-payment/shared'
 import { QRCodeCanvas } from 'qrcode.react'
-
+import ThemeToggle from "../components/ThemeToggle"
 // Simple UUID v4 generator
 function generateUUID(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -60,6 +60,8 @@ export function ReceivePage() {
   }
 
   return (
+        <>
+          <ThemeToggle />
     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <h2 style={{margin:'0'}}>Receive Payment</h2>
 
@@ -239,5 +241,6 @@ export function ReceivePage() {
         Back to Home
       </button>
     </div>
+    </>
   )
 }

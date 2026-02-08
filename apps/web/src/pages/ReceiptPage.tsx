@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useChainId, useWaitForTransactionReceipt } from 'wagmi'
 import { explorerTxUrl } from '../utils/explorer'
+import ThemeToggle from "../components/ThemeToggle"
 
 export function ReceiptPage() {
   const { hash } = useParams<{ hash: string }>()
@@ -21,14 +22,11 @@ export function ReceiptPage() {
   }
 
   return (
+        <>
+          <ThemeToggle />
     <div style={{ padding: '2rem', maxWidth: '600px', margin: '0 auto' }}>
       <div
-        style={{
-          background: '#fff',
-          border: '1px solid #e0e0e0',
-          borderRadius: '12px',
-          padding: '2rem',
-        }}
+        className='container'
       >
         <h2 style={{ margin: 0, marginBottom: '0.5rem' }}>
           {isSuccess ? '✅' : '⏳'} Payment {isSuccess ? 'Successful' : 'Processing'}
@@ -50,7 +48,7 @@ export function ReceiptPage() {
             <span
               style={{
                 fontWeight: '600',
-                color: isSuccess ? '#4caf50' : '#ff9800',
+                color: isSuccess ? '#4caf50' : '#2a5a4f',
               }}
             >
               {isLoading ? 'Pending' : 'Confirmed on Plasma'}
@@ -59,7 +57,7 @@ export function ReceiptPage() {
 
           <div className="receipt-row">
             <span style={{ color: '#666', fontSize: '0.9rem' }}>Transaction</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem',dispay: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <code style={{ fontSize: '0.9rem' }}>{hash && truncateHash(hash)}</code>
               {hash && (
                 <button
@@ -67,7 +65,7 @@ export function ReceiptPage() {
                   style={{
                     padding: '0.25rem 0.5rem',
                     fontSize: '0.8rem',
-                    background: '#f0f0f0',
+                    background: '#2a5a4f',
                     border: '1px solid #ddd',
                     borderRadius: '4px',
                     cursor: 'pointer',
@@ -86,12 +84,14 @@ export function ReceiptPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
-                  color: '#0066cc',
+                  color: '#2a5a4f',
                   textDecoration: 'none',
                   fontSize: '0.9rem',
                 }}
               >
+                <strong>
                 View on Plasmascan →
+                </strong>
               </a>
             </div>
           )}
@@ -99,21 +99,12 @@ export function ReceiptPage() {
 
         <button
           onClick={() => navigate('/')}
-          style={{
-            marginTop: '2rem',
-            padding: '0.75rem 1.5rem',
-            width: '100%',
-            background: '#0066cc',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            fontSize: '1rem',
-            cursor: 'pointer',
-          }}
+  
         >
           Back to Home
         </button>
       </div>
     </div>
+    </>
   )
 }
