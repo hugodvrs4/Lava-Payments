@@ -1,3 +1,4 @@
+// 🌐 Plasma Mainnet (Production)
 export const PLASMA_CHAIN = {
   id: 9745,
   name: 'Plasma',
@@ -21,6 +22,33 @@ export const PLASMA_CHAIN = {
       url: 'https://explorer.plasma.to',
     },
   },
+} as const;
+
+// 🧪 Plasma Testnet (Development)
+export const PLASMA_TESTNET_CHAIN = {
+  id: 9746,
+  name: 'Plasma Testnet',
+  network: 'plasma-testnet',
+  nativeCurrency: {
+    name: 'Plasma',
+    symbol: 'PLASMA',
+    decimals: 18,
+  },
+  rpcUrls: {
+    default: {
+      http: ['https://testnet-rpc.plasma.to'],
+    },
+    public: {
+      http: ['https://testnet-rpc.plasma.to'],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: 'Plasmascan Testnet',
+      url: 'https://testnet.plasmascan.to',
+    },
+  },
+  testnet: true,
 } as const;
 
 // Network-specific USDT0 addresses - SINGLE SOURCE OF TRUTH

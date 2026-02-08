@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useAccount } from 'wagmi'
 import { useNavigate } from 'react-router-dom'
 import type { InvoicePayload } from '@lava-payment/shared'
-import { PLASMA_CHAIN } from '@lava-payment/shared'
+import { ACTIVE_PLASMA_CHAIN } from '../config'
 import { QRCodeCanvas } from 'qrcode.react'
 import ThemeToggle from "../components/ThemeToggle"
 // Simple UUID v4 generator
@@ -41,7 +41,7 @@ export function ReceivePage() {
 
     const invoice: InvoicePayload = {
       v: 1,
-      chainId: PLASMA_CHAIN.id,
+      chainId: ACTIVE_PLASMA_CHAIN.id, // ✅ Génère invoice pour le réseau actif (Testnet ou Mainnet)
       token: 'USDT0',
       to: address,
       amount,
