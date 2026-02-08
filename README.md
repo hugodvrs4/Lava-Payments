@@ -45,15 +45,17 @@ We improve confidentiality through:
 
 **What we cannot do**: We cannot hide transaction amounts, sender/receiver addresses, or timing on-chain without specialized protocols (ZK, confidential transactions). This is an inherent limitation of standard EVM transactions.
 
-### Notes Are Never On-Chain
+### Invoice Memos: Not On-Chain, But Shareable
 
 When you add a memo/note to an invoice:
-- It's included in the shareable invoice code
+- It's included in the shareable invoice code/QR (by design, for context)
 - It's displayed to the payer before they send
 - It's stored in your local browser history
-- **It is NEVER sent on-chain**
+- **It is NEVER written to the blockchain**
 
 The blockchain only sees: `transfer(toAddress, amount)` — nothing else.
+
+**Transparency**: While memos don't go on-chain, they ARE present in the shared invoice link/code. This is intentional—it provides payment context to the payer without bloating blockchain data.
 
 ## Zero-Fee Transfers
 
@@ -166,8 +168,8 @@ lava-payment/
 npm install -g pnpm
 
 # Clone the repository
-git clone https://github.com/hugodvrs4/Lava-Payment.git
-cd Lava-Payment
+git clone https://github.com/hugodvrs4/Lava-Payments.git
+cd Lava-Payments
 
 # Install dependencies
 pnpm install
