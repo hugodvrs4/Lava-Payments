@@ -20,7 +20,7 @@ export function WalletConnect() {
   }
 
   return (
-    <div style={{ padding: '1rem', borderBottom: '1px solid #ccc' }}>
+    <div style={{ padding: '1rem', borderBottom: '1px solid #ccc',display: 'flex', flexDirection: 'column', alignItems: 'center'  }}>
       <p>Not connected</p>
       <button
         onClick={() => connect({ connector: connectors[0] })}

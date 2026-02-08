@@ -9,7 +9,7 @@ export function HomePage() {
     <>
       <ThemeToggle />
       <div className="container">
-        <img src="/src/img/logo.png" alt="Lava Payments Logo" style={{ width: '100px', marginBottom: '1rem' }} />
+        <img src="/src/img/logo.png" alt="Lava Payments Logo" style={{ width: '100px', marginBottom: '5px' }} />
         <h1>Lava Payments</h1>
         <p style={{ margin: '0', color: '#666' }}>
           Web3 payments on Plasma blockchain
@@ -21,9 +21,9 @@ export function HomePage() {
           </p>
         )}
 
-        <nav style={{ marginTop: '2rem' }}>
+        <nav style={{ marginTop: '5px' }}>
           <ul style={{ listStyle: 'none', marginLeft: 0 }}>
-            <li style={{ marginBottom: '1rem' }}>
+            <li style={{ marginBottom: '10px' }}>
               <Link 
                 to="/receive" 
                 className="hoverthink"
@@ -35,7 +35,7 @@ export function HomePage() {
               </Link>
             </li>
             
-            <li style={{ marginBottom: '1rem' }}>
+            <li style={{ marginBottom: '10px' }}>
               <Link 
                 to="/pay"
                 className="hoverthink"
@@ -47,7 +47,19 @@ export function HomePage() {
               </Link>
             </li>
             
-            <li style={{ marginBottom: '1rem' }}>
+            <li style={{ marginBottom: '10px' }}>
+              <Link 
+                to="/contacts"
+                className="hoverthink"
+              >
+                <strong>Contacts</strong>
+                <p style={{ fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.8)', marginTop: '0.25rem' }}>
+                  Manage your saved recipients
+                </p>
+              </Link>
+            </li>
+            
+            <li style={{ marginBottom: '10px' }}>
               <Link 
                 to="/history"
                 className="hoverthink"

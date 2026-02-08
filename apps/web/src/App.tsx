@@ -8,6 +8,7 @@ import { ReceivePage } from './pages/ReceivePage'
 import { PayPage } from './pages/PayPage'
 import { ReceiptPage } from './pages/ReceiptPage'
 import { HistoryPage } from './pages/HistoryPage'
+import { ContactsPage } from './pages/ContactsPage'
 
 const queryClient = new QueryClient()
 
@@ -23,6 +24,7 @@ function App() {
             <Route path="/pay" element={<PayPage />} />
             <Route path="/receipt/:hash" element={<ReceiptPage />} />
             <Route path="/history" element={<HistoryPage />} />
+            <Route path="/contacts" element={<ContactsPage />} />
           </Routes>
         </BrowserRouter>
       </QueryClientProvider>
