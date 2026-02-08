@@ -190,13 +190,9 @@ export function HistoryPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {transactions.map((tx) => (
                   <div
+                    className='case'
                     key={tx.hash}
-                    style={{
-                      padding: '1rem',
-                      background: '#2a5a4f',
-                      border: `2px solid ${tx.type === 'received' ? '#4caf50' : '#ff9800'}`,
-                      borderRadius: '4px',
-                    }}
+                    style={{  border: `2px solid ${tx.type === 'received' ? '#4caf50' : '#ff9800'}` }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                       <span

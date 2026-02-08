@@ -270,7 +270,11 @@ body:has(.history-page-wrapper)::-webkit-scrollbar-thumb {
 body:has(.history-page-wrapper)::-webkit-scrollbar-thumb:hover {
   background: var(--accent-hover-start);
 }
-
+.case{
+  padding: 1rem;
+  background: #2a5a4f;
+  border-radius: 4px;
+}
 /* Responsive pour tablet */
 @media (max-width: 768px) {
   .history-page-wrapper {
@@ -303,5 +307,9 @@ body:has(.history-page-wrapper)::-webkit-scrollbar-thumb:hover {
   
   .history-container h2 {
     font-size: 1.5rem;
+  }
+  .case{
+    width: 50%;
+    background-color: #111;
   }
 }
