@@ -288,7 +288,8 @@ body:has(.history-page-wrapper, .receive-page-wrapper)::-webkit-scrollbar-thumb 
     padding-right: 0.5rem;
   }
   .history-container, .receive-page-wrapper .container {
-    width: 90%;
+    width: 80 %;
     padding: 25px 12px;
   }
+
 }
