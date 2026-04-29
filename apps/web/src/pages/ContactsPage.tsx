@@ -363,8 +363,8 @@ export function ContactsPage() {
                             flex: 1,
                             padding: '0.5rem',
                             fontSize: '0.9rem',
-                            background: 'white',
-                            color: 'var(--accent-color)'
+                            background: '#2a5a4f',
+                            color: 'white'
                           }}
                         >
                           💸 Pay
