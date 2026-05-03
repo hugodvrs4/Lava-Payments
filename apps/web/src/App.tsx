@@ -16,7 +16,7 @@ function App() {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+        <BrowserRouter basename="/Lava-Payments">
           <WalletConnect />
           <Routes>
             <Route path="/" element={<HomePage />} />
