@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useAccount } from 'wagmi'
 import ThemeToggle from "../components/ThemeToggle"
+import logoUrl from '../img/logo.png'
 
 export function HomePage() {
   const { isConnected } = useAccount()
@@ -9,7 +10,7 @@ export function HomePage() {
     <>
       <ThemeToggle />
       <div className="container">
-        <img src="/src/img/logo.png" alt="Lava Payments Logo" style={{ width: '100px', marginBottom: '5px' }} />
+        <img src={logoUrl} alt="Lava Payments Logo" style={{ width: '100px', marginBottom: '5px' }} />
         <h1>Lava Payments</h1>
         <p style={{ margin: '0', color: '#666' }}>
           Web3 payments on Plasma blockchain

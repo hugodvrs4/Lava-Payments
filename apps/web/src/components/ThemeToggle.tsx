@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react'
+import iconeUrl from '../img/icone.png'
+import logoUrl from '../img/logo.png'
+import iconeCustomUrl from '../img/icone-custom.png'
 
 export default function ThemeToggle() {
   const [theme, setTheme] = useState<'dark' | 'light' | 'custom'>('dark')
@@ -19,13 +22,13 @@ export default function ThemeToggle() {
     // Change favicon based on theme
     switch (currentTheme) {
       case 'dark':
-        link.href = '/src/img/icone.png'  // Icône pour le thème sombre
+        link.href = iconeUrl
         break
       case 'light':
-        link.href = '/src/img/logo.png'  // Icône pour le thème clair
+        link.href = logoUrl
         break
       case 'custom':
-        link.href = '/src/img/icone-custom.png'  // Icône pour le thème custom
+        link.href = iconeCustomUrl
         break
     }
   }
