@@ -8,7 +8,7 @@
  * @param txHash - Transaction hash
  * @returns Plasmascan URL
  */
-export function explorerTxUrl(chainId: number, txHash: string): string {
+export function explorerTxUrl(_chainId: number, txHash: string): string {
   return `https://testnet.plasmascan.to/tx/${txHash}`
 }
 
@@ -18,6 +18,6 @@ export function explorerTxUrl(chainId: number, txHash: string): string {
  * @param address - Wallet address
  * @returns Plasmascan URL
  */
-export function explorerAddressUrl(chainId: number, address: string): string {
+export function explorerAddressUrl(_chainId: number, address: string): string {
   return `https://testnet.plasmascan.to/address/${address}`
 }

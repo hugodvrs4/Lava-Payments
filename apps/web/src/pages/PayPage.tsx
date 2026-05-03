@@ -196,17 +196,13 @@ export function PayPage() {
 
     ;(async () => {
       try {
-        await reader.decodeFromVideoDevice(null, videoEl, async (result) => {
+        await reader.decodeFromVideoDevice(undefined, videoEl, async (result) => {
           if (stopped) return
           if (!result) return
 
           const raw = result.getText().trim()
 
           stopped = true
-          try {
-            reader.reset()
-          } catch {}
-
           setScanning(false)
 
           // CASE 1: QR contains a URL /pay?invoice=...
@@ -238,9 +234,6 @@ export function PayPage() {
 
     return () => {
       stopped = true
-      try {
-        reader.reset()
-      } catch {}
     }
   }, [scanning, navigate])
 
